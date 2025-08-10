@@ -40,6 +40,7 @@ from emopt.misc import NOT_PARALLEL, RANK, run_on_master
 from emopt.opt_def import OptDefPNF2D
 
 import numpy as np
+import tempfile, os
 
 class WGCrossAM_TM(OptDefPNF2D):
     """Define an adjoint method class which calculates the figure of merit and
@@ -206,6 +207,7 @@ class WGCrossAM_TM(OptDefPNF2D):
         dFdHz = np.zeros([sim.M, sim.N], dtype=np.complex128)
         dFdEx = np.zeros([sim.M, sim.N], dtype=np.complex128)
         dFdEy = np.zeros([sim.M, sim.N], dtype=np.complex128)
+        domain = emopt.misc.DomainCoordinates(0, sim.X, 0, sim.Y, 0, 0, sim.dx, sim.dy, 1.0)
 
         Hz, Ex, Ey = sim.saved_fields[0]
         Psrc = sim.source_power
@@ -218,7 +220,7 @@ class WGCrossAM_TM(OptDefPNF2D):
         dFdEx[j, k] = -self.mode_match.get_dFdEx()
         dFdEy[j, k] = -self.mode_match.get_dFdEy()
 
-        return (dFdHz, dFdEx, dFdEy)
+        return {domain : (dFdHz, dFdEx, dFdEy)}
 
     def calc_grad_p(self, sim, params):
         """Out figure of merit contains no additional non-field dependence on
@@ -235,15 +237,16 @@ def opt_plot(params, sim, am, fom_hist):
     This function is called after each iteration of the optimization
     """
     print('Finished iteration %d.' % (len(fom_hist)+1))
-    current_fom = -1*am.calc_fom(sim, params)
+    current_fom = -1*am.calc_fom(sim, params) / sim.source_power
     fom_hist.append(current_fom)
     foms = {'IL':fom_hist}
 
     Hz, Ex, Ey = sim.saved_fields[1]
     eps = sim.eps.get_values_in(sim.field_domains[1])
 
-    emopt.io.plot_iteration(np.real(Hz), np.real(eps), sim.Xreal, sim.Yreal, foms,
-                   fname='current_result.pdf')
+    fname = os.path.join(tempfile.gettempdir(), 'current_result.pdf')
+    emopt.dvio.plot_iteration(np.real(Hz), np.real(eps), sim.Xreal, sim.Yreal, foms,
+                   fname=fname)
 
 if __name__ == '__main__':
     ####################################################################################
@@ -382,7 +385,7 @@ if __name__ == '__main__':
 
     # Get the current sources which excite the desired mode
     msrc = mode.get_source(mindex, dx, dy)
-    sim.set_sources(mode, src_domain=src_line, mindex=mindex)
+    sim.set_sources({src_line : mode}, mindex=mindex)
 
     ####################################################################################
     # Set up the Mode match which will be used by the figure of merit

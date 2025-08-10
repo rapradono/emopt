@@ -81,9 +81,10 @@ mode_slice = emopt.misc.DomainCoordinates(0.8, 0.8, w_pml, Y-w_pml, w_pml, Z-w_p
 
 mode = emopt.solvers.Mode2D(wavelength, eps, mu, mode_slice, n0=3.45,
                                    neigs=4)
+srcs = {mode_slice : mode}
 mode.build()
 mode.solve()
-sim.set_sources(mode, mode_slice)
+sim.set_sources(srcs)
 
 #####################################################################################
 # Simulate and view results

@@ -4,7 +4,7 @@ from .misc import warning_message, error_message, NOT_PARALLEL
 from ._grid_ctypes import libGrid, c_int
 
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
+__license__ = "BSD-3-Clause"
 
 class MaterialPrimitive(object):
     """Define any primitive object that contains a material.
@@ -484,7 +484,7 @@ class Polygon(MaterialPrimitive):
         self._transformations.append( ('mirror', mx, my, x0, y0) )
 
     def add(self, p2):
-        Npoly = np.zeros(1, dtype=np.int)
+        Npoly = np.zeros(1, dtype=int)
         polygons = libGrid.Polygon_add(self._object, p2._object, Npoly)
         Npoly = Npoly[0]
 
@@ -500,7 +500,7 @@ class Polygon(MaterialPrimitive):
         return new_polygons
 
     def subtract(self, p2):
-        Npoly = np.zeros(1, dtype=np.int)
+        Npoly = np.zeros(1, dtype=int)
         polygons = libGrid.Polygon_subtract(self._object, p2._object, Npoly)
         Npoly = Npoly[0]
 
@@ -516,7 +516,7 @@ class Polygon(MaterialPrimitive):
         return new_polygons
 
     def intersect(self, p2):
-        Npoly = np.zeros(1, dtype=np.int)
+        Npoly = np.zeros(1, dtype=int)
         polygons = libGrid.Polygon_intersect(self._object, p2._object, Npoly)
         Npoly = Npoly[0]
 

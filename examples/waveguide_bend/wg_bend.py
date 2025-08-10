@@ -14,6 +14,7 @@ from emopt.opt_def import OptDef
 from emopt.misc import NOT_PARALLEL, run_on_master
 
 import numpy as np
+import tempfile, os
 
 class WGBendOptDef(OptDef):
 
@@ -70,6 +71,7 @@ class WGBendOptDef(OptDef):
         dfdHz = np.zeros([sim.M, sim.N], dtype=np.complex128)
         dfdEx = np.zeros([sim.M, sim.N], dtype=np.complex128)
         dfdEy = np.zeros([sim.M, sim.N], dtype=np.complex128)
+        adj_domain = emopt.misc.DomainCoordinates(0, sim.X, 0, sim.Y, 0, 0, sim.dx, sim.dy, 1.0)
 
         dfdHz[src_plane.j, src_plane.k] = -0.25 * dx * np.conj(Ex) / self.Psrc
         dfdEx[src_plane.j, src_plane.k] = -0.25 * dx * np.conj(Hz) / self.Psrc
@@ -77,7 +79,7 @@ class WGBendOptDef(OptDef):
         dFdHz, dFdEx, dFdEy = emopt.fomutils.interpolated_dFdx_2D(sim, dfdHz,
                                                                   dfdEx, dfdEy)
 
-        return (dFdHz, dFdEx, dFdEy)
+        return {adj_domain : (dFdHz, dFdEx, dFdEy)}
 
     def calc_grad_p(self, sim, params):
         return np.zeros(params.shape)
@@ -116,8 +118,8 @@ def callback(params, sim, am, fom_history, Ts, Exm, Eym, Hzm):
     additional['source_power'] = sim.source_power
     additional['w_pml'] = w_pml
 
-    fname = 'wg_bend_%d' % (len(fom_history))
-    emopt.io.save_results(fname, data, additional)
+    fname = os.path.join(tempfile.gettempdir(), 'wg_bend_%d' % (len(fom_history)))
+    emopt.dvio.save_results(fname, data, additional)
 
 if __name__ == '__main__':
     ###########################################################################
@@ -178,7 +180,7 @@ if __name__ == '__main__':
     mode.build()
     mode.solve()
 
-    sim.set_sources(mode, src_plane)
+    sim.set_sources({src_plane: mode})
 
     # save mode fields for analysis
     T_area = emopt.misc.DomainCoordinates(wg_pos-h_src/2, wg_pos+h_src/2,

@@ -1,30 +1,31 @@
 """Provides a ctypes interface between C++ FDTD library and python."""
 
-from ctypes import cdll, c_void_p, c_int, c_double, c_bool, c_char_p
+from ctypes import *
 import os
 import numpy as np
 from numpy.ctypeslib import ndpointer
 
 __author__ = "Andrew Michaels"
 __license__ = "GPL License, Version 3.0"
+__version__ = "2019.5.6"
+__maintainer__ = "Andrew Michaels"
+__status__ = "development"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-so_path = os.path.join(dir_path, 'FDTD.so')
+so_path = os.path.join(dir_path, 'FDTD_gpu.so')
 libFDTD = cdll.LoadLibrary(so_path)
 
-# define type compatible with numpy arrays
+# useful defs
 c_complex_p = ndpointer(np.complex128, ndim=1, flags='C')
 c_double_p = ndpointer(np.double, ndim=1, flags='C')
 
 #######################################################
 # ctypes interface definition
 #######################################################
-# FDTD_new() -> FDTD*
 libFDTD.FDTD_new.argtypes = []
 libFDTD.FDTD_new.restype = c_void_p
 
-# FDTD_set_wavelength(Fdtd*, double)
 libFDTD.FDTD_set_wavelength.argtypes = [c_void_p, c_double]
 libFDTD.FDTD_set_wavelength.restype = None
 
@@ -41,8 +42,36 @@ libFDTD.FDTD_set_local_grid.argtypes = [c_void_p,
                                         c_int, c_int, c_int]
 libFDTD.FDTD_set_local_grid.restype = None
 
+libFDTD.FDTD_set_local_grid_perturb.argtypes = [c_void_p,
+                                        c_int, c_int]
+libFDTD.FDTD_set_local_grid_perturb.restype = None
+
 libFDTD.FDTD_set_dt.argtypes = [c_void_p, c_double]
 libFDTD.FDTD_set_dt.restype = None
+
+libFDTD.FDTD_set_domain_decomposition.argtypes = [c_void_p, c_char]
+libFDTD.FDTD_set_domain_decomposition.restype = None
+
+libFDTD.FDTD_set_rtol.argtypes = [c_void_p, c_double]
+libFDTD.FDTD_set_rtol.restype = None
+
+libFDTD.FDTD_set_gpus_count.argtypes = [c_void_p, c_int]
+libFDTD.FDTD_set_gpus_count.restype = None
+
+libFDTD.FDTD_set_Ncycle.argtypes = [c_void_p, c_double]
+libFDTD.FDTD_set_Ncycle.restype = None
+
+libFDTD.FDTD_set_GPUDirect.argtypes = [c_void_p]
+libFDTD.FDTD_set_GPUDirect.restype = None
+
+libFDTD.FDTD_block_CUDA_multigpu_init.argtypes = [c_void_p]
+libFDTD.FDTD_block_CUDA_multigpu_init.restype = None
+
+libFDTD.FDTD_block_CUDA_multigpu_free.argtypes = [c_void_p]
+libFDTD.FDTD_block_CUDA_multigpu_free.restype = None
+
+libFDTD.FDTD_solve.argtypes = [c_void_p]
+libFDTD.FDTD_solve.restype = None
 
 libFDTD.FDTD_set_complex_eps.argtypes = [c_void_p, c_bool]
 libFDTD.FDTD_set_complex_eps.restype = None
@@ -53,8 +82,21 @@ libFDTD.FDTD_set_field_arrays.argtypes = [c_void_p,
 
 libFDTD.FDTD_set_field_arrays.restype = None
 
+libFDTD.FDTD_copyCUDA_field_arrays.argtypes = [c_void_p]
+libFDTD.FDTD_copyCUDA_field_arrays.restype = None
+libFDTD.FDTD_block_CUDA_malloc_memcpy.argtypes = [c_void_p]
+libFDTD.FDTD_block_CUDA_malloc_memcpy.restype = None
+libFDTD.FDTD_block_CUDA_free.argtypes = [c_void_p]
+libFDTD.FDTD_block_CUDA_free.restype = None
+libFDTD.FDTD_block_CUDA_src_free.argtypes = [c_void_p]
+libFDTD.FDTD_block_CUDA_src_free.restype = None
+libFDTD.FDTD_block_CUDA_src_malloc_memcpy.argtypes = [c_void_p]
+libFDTD.FDTD_block_CUDA_src_malloc_memcpy.restype = None
+libFDTD.FDTD_calc_ydAx.argtypes = [c_void_p, c_ulong, c_ulong, c_ulong, c_ulong, c_ulong, c_ulong, c_ulong, c_complex_p, c_complex_p, c_complex_p, c_complex_p,c_complex_p, c_complex_p, c_complex_p,
+                                   c_complex_p, c_complex_p, c_complex_p,c_complex_p, c_complex_p, c_complex_p]
+libFDTD.FDTD_calc_ydAx.restype = None
+
 libFDTD.FDTD_set_mat_arrays.argtypes = [c_void_p,
-                                          c_complex_p, c_complex_p, c_complex_p,
                                           c_complex_p, c_complex_p, c_complex_p]
 
 libFDTD.FDTD_set_mat_arrays.restype = None
@@ -76,9 +118,6 @@ libFDTD.FDTD_set_pml_properties.restype = None
 
 libFDTD.FDTD_build_pml.argtypes = [c_void_p]
 libFDTD.FDTD_build_pml.restype = None
-
-libFDTD.FDTD_reset_pml.argtypes = [c_void_p]
-libFDTD.FDTD_reset_pml.restype = None
 
 libFDTD.FDTD_set_t0_arrays.argtypes = [c_void_p,
                                        c_complex_p, c_complex_p, c_complex_p,
@@ -105,6 +144,10 @@ libFDTD.FDTD_calc_amplitude_3T.argtypes = [c_double, c_double, c_double,
                                            c_double, c_double, c_double,
                                            c_double]
 libFDTD.FDTD_calc_amplitude_3T.restype = c_double
+
+libFDTD.FDTD_capture_pbox_fields.argtypes = [c_void_p, c_complex_p, c_complex_p, c_complex_p,
+                                             c_complex_p, c_complex_p, c_complex_p]
+libFDTD.FDTD_capture_pbox_fields.restype = None
 
 libFDTD.FDTD_capture_t0_fields.argtypes = [c_void_p]
 libFDTD.FDTD_capture_t0_fields.restype = None
@@ -146,3 +189,6 @@ libFDTD.FDTD_copy_to_ghost_comm.restype = None
 libFDTD.FDTD_copy_from_ghost_comm.argtypes = [c_double_p, c_complex_p,
                                               c_int, c_int, c_int]
 libFDTD.FDTD_copy_from_ghost_comm.restype = None
+
+libFDTD.FDTD_reset_pml.argtypes = [c_void_p]
+libFDTD.FDTD_reset_pml.restype = None

@@ -5,7 +5,7 @@ import numpy as np
 from numpy.ctypeslib import ndpointer
 
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
+__license__ = "BSD-3-Clause"
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -16,7 +16,7 @@ libGrid = cdll.LoadLibrary(so_path)
 c_complex_2D_p = ndpointer(np.complex128, ndim=2, flags='C')
 c_complex_1D_p = ndpointer(np.complex128, ndim=1, flags='C')
 c_double_p = ndpointer(np.double, ndim=1, flags='C')
-c_int_p = ndpointer(np.int, ndim=1, flags='C')
+c_int_p = ndpointer(int, ndim=1, flags='C')
 c_void_p_p = POINTER(c_void_p)
 
 #####################################################################################

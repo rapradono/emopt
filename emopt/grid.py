@@ -27,7 +27,7 @@ from ctypes import c_int, c_double
 from .misc import warning_message
 
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
+__license__ = "BSD-3-Clause"
 
 class Material2D(object):
     """Define a general interface for 2D Material distributions.

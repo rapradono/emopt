@@ -141,7 +141,7 @@ wavelength = 1.55
 # results/gradients
 # min_rindex is the minimum refractive index in the simulation. In simulations where this is 
 # greater than 1, setting this appropriately can speed up those simulation significantly.
-sim = emopt.solvers.Maxwell3D(X,Y,Z,dx,dy,dz,wavelength, rtol=1e-5, min_rindex=1.44,
+sim = emopt.solvers.fdtd_gpu.Maxwell3D(X,Y,Z,dx,dy,dz,wavelength, rtol=1e-5, min_rindex=1.44,
                               nconv=200)
 sim.Nmax = 1000*sim.Ncycle
 w_pml = dx * 15 # set the PML width

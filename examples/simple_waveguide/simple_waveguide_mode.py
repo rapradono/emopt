@@ -43,13 +43,13 @@ n0 = 1.44
 n1 = 3.45
 
 # set a background permittivity of 1
-eps_background = emopt.grid.Rectangle(X/2, Y/2, 2*X, Y)
+eps_background = emopt.geometry.Rectangle(X/2, Y/2, 2*X, Y)
 eps_background.layer = 2
 eps_background.material_value = n0**2
 
 # Create a high index waveguide through the center of the simulation
 h_wg = 0.5
-waveguide = emopt.grid.Rectangle(X/2, Y/2, X*2, h_wg)
+waveguide = emopt.geometry.Rectangle(X/2, Y/2, X*2, h_wg)
 waveguide.layer = 1
 waveguide.material_value = n1**2
 
@@ -83,7 +83,7 @@ mode.solve()
 mindex = mode.find_mode_index(0)
 
 # set the sources using our mode solver
-sim.set_sources(mode, src_line, mindex)
+sim.set_sources({src_line : mode}, mindex)
 
 ####################################################################################
 # Build and simulate

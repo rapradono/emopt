@@ -40,6 +40,7 @@ from emopt.opt_def import OptDefPNF2D
 
 import numpy as np
 from math import pi
+import os, tempfile
 
 class SiliconGratingOptDef(OptDefPNF2D):
     """Compute the merit function and gradient of a grating coupler.
@@ -249,8 +250,9 @@ def plot_update(params, fom_list, sim, am):
     eps = sim.eps.get_values_in(sim.field_domains[1])
 
     foms = {'Insertion Loss' : fom_list}
-    emopt.io.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Xreal,
-                            sim.Yreal, foms, fname='current_result.pdf',
+    fname = os.path.join(tempfile.gettempdir(), 'current_result.pdf')
+    emopt.dvio.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Xreal,
+                            sim.Yreal, foms, fname=fname,
                             dark=True)
 
     data = {}
@@ -262,8 +264,8 @@ def plot_update(params, fom_list, sim, am):
     data['foms'] = fom_list
 
     i = len(fom_list)
-    fname = 'data/gc_opt_results'
-    emopt.io.save_results(fname, data)
+    fname = os.path.join(tempfile.gettempdir(), "gc_opt")
+    emopt.dvio.save_results(fname, data)
 
 if __name__ == '__main__':
     ####################################################################################

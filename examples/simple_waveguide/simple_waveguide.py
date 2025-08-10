@@ -49,13 +49,13 @@ n0 = 1.0
 n1 = 3.0
 
 # set a background permittivity of 1
-eps_background = emopt.grid.Rectangle(X/2, Y/2, 2*X, Y)
+eps_background = emopt.geometry.Rectangle(X/2, Y/2, 2*X, Y)
 eps_background.layer = 2
 eps_background.material_value = n0**2
 
 # Create a high index waveguide through the center of the simulation
 h_wg = 0.5
-waveguide = emopt.grid.Rectangle(X/2, Y/2, 2*X, h_wg)
+waveguide = emopt.geometry.Rectangle(X/2, Y/2, 2*X, h_wg)
 waveguide.layer = 1
 waveguide.material_value = n1**2
 
@@ -72,12 +72,13 @@ sim.set_materials(eps, mu)
 # setup the sources
 ####################################################################################
 # setup the sources -- just a dipole in the center of the waveguide
+domain = emopt.misc.DomainCoordinates(0.0, X, 0.0, Y, 0.0, 0.0, dx, dy, 1.0)
 Jz = np.zeros([M,N], dtype=np.complex128)
 Mx = np.zeros([M,N], dtype=np.complex128)
 My = np.zeros([M,N], dtype=np.complex128)
 Jz[M//2, N//2] = 1.0
 
-sim.set_sources((Jz, Mx, My))
+sim.set_sources({domain : (Jz, Mx, My)})
 
 ####################################################################################
 # Build and simulate

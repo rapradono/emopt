@@ -17,8 +17,8 @@ from math import pi
 ####################################################################################
 #Simulation Region parameters
 ####################################################################################
-X = 5.0
-Y = 15.0
+X = 10.0
+Y = 10.0
 dx = 0.02
 dy = 0.02
 wlen = 1.55
@@ -49,7 +49,7 @@ n0 = 1.0
 n1 = 1.444
 
 # set a background permittivity of 1
-eps_background = emopt.grid.Rectangle(X/2, 0, 2*X, Y)
+eps_background = emopt.geometry.Rectangle(X/2, 0, 2*X, Y)
 eps_background.layer = 2
 eps_background.material_value = n0**2
 
@@ -60,8 +60,7 @@ y0 = Y/2
 theta = np.linspace(0,2*pi,100)
 xs = x0 + R*np.cos(theta)
 ys = y0 + R*np.sin(theta)
-cyl = emopt.grid.Polygon()
-cyl.set_points(xs,ys)
+cyl = emopt.geometry.Polygon(xs, ys)
 cyl.layer = 1
 cyl.material_value = n1**2
 
@@ -78,20 +77,17 @@ sim.set_materials(eps, mu)
 # setup the sources
 ####################################################################################
 # setup the sources -- just a dipole in the center of the waveguide
-Jz = np.zeros([M,N], dtype=np.complex128)
-Mx = np.zeros([M,N], dtype=np.complex128)
-My = np.zeros([M,N], dtype=np.complex128)
+src_line = emopt.misc.DomainCoordinates(sim.w_pml[0] + dx, sim.w_pml[0] + dx, 0, X, 0.0, 0.0, dx, dy, 1.0)
 
 # planewave incident along x
-Jz[sim.w_pml_bottom:M-sim.w_pml_top, sim.w_pml_left+1] = 1.0
-My[sim.w_pml_bottom:M-sim.w_pml_top, sim.w_pml_left+1] = 1.0
+Jz = np.zeros(src_line.shape, dtype=np.complex128)
+Mx = np.zeros(src_line.shape, dtype=np.complex128)
+My = np.zeros(src_line.shape, dtype=np.complex128)
 
-# planewave incident along y
-#Jz[sim.w_pml_bottom+1, sim.w_pml_left:N-sim.w_pml_right] = 1.0
-#Mx[sim.w_pml_bottom+1, sim.w_pml_left:N-sim.w_pml_right] = -1.0
+Jz[:] = 1.0
+Mx[:] = 1.0
 
-
-sim.set_sources((Jz, Mx, My))
+sim.set_sources({src_line : (Jz, Mx, My)})
 
 ####################################################################################
 # Build and simulate

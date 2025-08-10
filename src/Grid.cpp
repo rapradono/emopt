@@ -980,6 +980,7 @@ void StructuredMaterial3D::get_values(ArrayXcd& grid, int k1, int k2,
     }
 
     for(int i = i1; i < i2; i++) {
+	#pragma omp parallel for private(index) schedule(dynamic)
         for(int j = j1; j < j2; j++) {
             for(int k = k1; k < k2; k++) {
                 index = (i-i1)*Nx*Ny + (j-j1)*Nx + (k-k1);

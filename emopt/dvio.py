@@ -4,7 +4,7 @@ from .misc import run_on_master, warning_message, NOT_PARALLEL, COMM
 import numpy as np
 
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
+__license__ = "BSD-3-Clause"
 
 @run_on_master
 def plot_iteration(field, structure, W, H, foms, fname='', layout='auto',

@@ -10,12 +10,12 @@ else
 	endif
 endif
 
-CXX = g++
+CXX = @CXX@
 NVCC = nvcc
 CXXFLAGS = -Wall -fopenmp -O3 -march=native -DNDEBUG -std=c++14
 
-INCLUDES = -I/home/andy/.local/include -I/home/andy/.local/include
-LDFLAGS =  -lpthread
+INCLUDES = -I@EIGEN_DIR@ -I@BOOST_DIR@
+LDFLAGS = @LDFLAGS@ -lpthread
 
 all: Grid.o Grid_ctypes.o Grid.cpp Grid.hpp Grid_ctypes.cpp Grid_ctypes.hpp fdtd.o fdtd.cpp fdtd.hpp fdtd.cu
 	${CXX} ${SHARED_FLAG} -fopenmp -fPIC -o Grid.so Grid.o Grid_ctypes.o ${LDFLAGS}

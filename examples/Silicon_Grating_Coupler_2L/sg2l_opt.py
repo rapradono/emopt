@@ -231,7 +231,7 @@ def plot_update(params, fom_list, sim, am):
     eps = sim.eps.get_values_in(sim.field_domains[1])
 
     foms = {'Insertion Loss' : fom_list}
-    emopt.io.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Xreal,
+    emopt.dvio.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Xreal,
                             sim.Yreal, foms, fname='current_result.pdf')
 
     data = {}
@@ -244,7 +244,7 @@ def plot_update(params, fom_list, sim, am):
 
     i = len(fom_list)
     fname = 'data/sg2l_opt_snapshot'
-    emopt.io.save_results(fname, data)
+    emopt.dvio.save_results(fname, data)
 
 if __name__ == '__main__':
     ####################################################################################

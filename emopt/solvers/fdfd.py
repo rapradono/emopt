@@ -165,7 +165,7 @@ class Maxwell2D(MaxwellSolver, metaclass=ABCMeta):
         return vdiag
 
     @abstractmethod
-    def calc_ydAx(self, Adiag0):
+    def calc_ydAx(self, Adiag0, ub=None):
         """Calculate y^T * (A1-A0) * x.
 
         Parameters
@@ -638,9 +638,9 @@ class Maxwell2DTE(Maxwell2D):
                 Mx[domain.j, domain.k] = msrc[1]
                 My[domain.j, domain.k] = msrc[2]
             else:
-                Jz[domain.j, domain.k] = arrs[0]
-                Mx[domain.j, domain.k] = arrs[1]
-                My[domain.j, domain.k] = arrs[2]
+                Jz[domain.j, domain.k] = src[0]
+                Mx[domain.j, domain.k] = src[1]
+                My[domain.j, domain.k] = src[2]
 
         self.Jz = Jz
         self.Mx = Mx
@@ -1366,7 +1366,7 @@ class Maxwell2DTE(Maxwell2D):
 
         x_all = np.arange(w_pml_l, N-w_pml_r)
         y_all = np.arange(w_pml_b, M-w_pml_t)
-        y_all = y_all.reshape(y_all.shape[0], 1).astype(np.int)
+        y_all = y_all.reshape(y_all.shape[0], 1).astype(int)
 
         if(not self.real_materials):
             eps = self._eps.get_values(0, N, 0, M)
@@ -1385,7 +1385,7 @@ class Maxwell2DTE(Maxwell2D):
 
         return P_S + P_loss.real
 
-    def calc_ydAx(self, Adiag0):
+    def calc_ydAx(self, Adiag0, ub=None):
         """Calculate y^T * (A1-A0) * x.
 
         Parameters
@@ -1596,7 +1596,7 @@ class Maxwell2DTM(Maxwell2DTE):
         """
         new_srcs = {}
 
-        for domain, src in srcs:
+        for domain, src in srcs.items():
             if(isinstance(src, modes.Mode1DTM)):
                 msrc = src.get_source(mindex, self._dx, self._dy)
                 new_srcs[domain] = (msrc[0], -1*msrc[1], -1*msrc[2])
@@ -1605,7 +1605,7 @@ class Maxwell2DTM(Maxwell2DTE):
 
         super().set_sources(new_srcs, mindex)
 
-    def set_adjoint_sources(self, src):
+    def set_adjoint_sources(self, srcs):
         """Set the sources of the system used in the adjoint solve.
 
         The details of these sources are identical to the forward solution
@@ -1613,13 +1613,13 @@ class Maxwell2DTM(Maxwell2DTE):
 
         Parameters
         ----------
-        src : tuple of numpy.ndarray
+        srcs : tuple of numpy.ndarray
             The current sources in the form (Mz_adj, Jx_adj, Jy_adj).  Each array 
             in the tiple should be a 2D numpy.ndarry with dimensions MxN.
         """
         new_srcs = {}
 
-        for domain, src in srcs:
+        for domain, src in srcs.items():
             # In order to properly make use of the TE subclass, we need to flip the
             # sign of Jx_adj and Jy_adj
             new_srcs[domain] = (src[0], -1*src[1], -1*src[2])
@@ -1845,7 +1845,7 @@ class Maxwell2DTM(Maxwell2DTE):
 
         x_all = np.arange(w_pml_l, N-w_pml_r)
         y_all = np.arange(w_pml_b, M-w_pml_t)
-        y_all = y_all.reshape(y_all.shape[0], 1).astype(np.int)
+        y_all = y_all.reshape(y_all.shape[0], 1).astype(int)
 
         if(not self.real_materials):
             eps = self._eps_actual.get_values(0, N, 0, M)

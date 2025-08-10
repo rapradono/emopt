@@ -39,8 +39,8 @@ h_Si = 0.22
 # we need to set up the geometry of the cross section for which the mode will
 # be computed. Here we use emopt.grid objects to define the permittivity and
 # permeability of waveguiding structure for which the modes will be calculated
-strip = emopt.grid.Rectangle(W/2, H/2, w_wg, h_Si)
-eps_bg = emopt.grid.Rectangle(W/2, H/2, 2*W, 2*H)
+strip = emopt.geometry.Rectangle(W/2, H/2, w_wg, h_Si)
+eps_bg = emopt.geometry.Rectangle(W/2, H/2, 2*W, 2*H)
 
 strip.layer = 1; strip.material_value = eps_Si
 eps_bg.layer = 2; eps_bg.material_value = eps_SiO2

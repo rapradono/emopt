@@ -2,12 +2,12 @@
 devices.
 """
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
-__version__ = "2020.10.3"
+__license__ = "BSD-3-Clause"
+__version__ = "0.5.0"
 __maintainer__ = "Andrew Michaels"
 __status__ = "development"
 
-from . import opt_def, solvers, fomutils, grid, io, misc, optimizer, geometry
+from . import dvio, opt_def, solvers, fomutils, grid, misc, optimizer, geometry
 
-__all__ = ["opt_def", "solvers", "fomutils", "grid", "io", "misc",
+__all__ = ["opt_def", "solvers", "fomutils", "grid", "dvio", "misc",
           "optimizer", "geometry"]

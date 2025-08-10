@@ -66,8 +66,8 @@ Mz = np.zeros([1,1,1], dtype=np.complex128)
 
 Jy[0,0,0] = 1.0
 
-src = [Jx, Jy, Jz, Mx, My, Mz]
-sim.set_sources(src, src_point)
+srcs = {src_point : [Jx, Jy, Jz, Mx, My, Mz]}
+sim.set_sources(srcs)
 
 #####################################################################################
 # Run the simulation and plot the results 

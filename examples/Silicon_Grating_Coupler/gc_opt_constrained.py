@@ -294,7 +294,7 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
 
     foms = {'FOM' : fom_list,
             'Insertion Loss' : fom_unconstrained}
-    emopt.io.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Wreal,
+    emopt.dvio.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Wreal,
                             sim.Hreal, foms, fname='current_result.pdf')
 
     data = {}
@@ -307,7 +307,7 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
 
     i = len(fom_list)
     fname = 'data/gc_8deg_opt_constrained'
-    emopt.io.save_results(fname, data)
+    emopt.dvio.save_results(fname, data)
 
 if __name__ == '__main__':
     ####################################################################################

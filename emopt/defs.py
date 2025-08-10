@@ -1,9 +1,9 @@
 """Define some useful definitions for emopt.
 """
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
+__license__ = "BSD-3-Clause"
 
-class FieldComponent(object):
+class FieldComponent:
     Ex = 'Ex'
     Ey = 'Ey'
     Ez = 'Ez'
@@ -11,7 +11,7 @@ class FieldComponent(object):
     Hy = 'Hy'
     Hz = 'Hz'
 
-class SourceComponent(object):
+class SourceComponent:
     Jx = 'Jx'
     Jy = 'Jy'
     Jz = 'Jz'

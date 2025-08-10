@@ -8,7 +8,7 @@ from .defs import FieldComponent
 import numpy as np
 
 __author__ = "Andrew Michaels"
-__license__ = "GPL License, Version 3.0"
+__license__ = "BSD-3-Clause"
 
 #####################################################################################
 # Step and Rect Functions
@@ -24,8 +24,8 @@ def step(x, k, y0=0, A=1.0):
         \\Pi(x) = \\frac{A}{1 + e^{-k x}} + y_0
 
     This function has the property that :math:`\\Pi \\rightarrow y_0` as :math:`x
-    \\rightarrow -\infty` and :math:`\\Pi \\rightarrow y_0 + A` as :math:`x
-    \\rightarrow \infty`.
+    \\rightarrow -\\infty` and :math:`\\Pi \\rightarrow y_0 + A` as :math:`x
+    \\rightarrow \\infty`.
 
     Parameters
     ----------
@@ -1507,7 +1507,7 @@ def power_norm_dFdx_TE(sim, f, dfdEz, dfdHx, dfdHy):
 
     x_all = np.arange(w_pml_l, N-w_pml_r)
     y_all = np.arange(w_pml_b, M-w_pml_t)
-    y_all = y_all.reshape(y_all.shape[0], 1).astype(np.int)
+    y_all = y_all.reshape(y_all.shape[0], 1).astype(int)
 
     dPdEz = np.zeros([M, N], dtype=np.complex128)
     dPdHx = np.zeros([M, N], dtype=np.complex128)
@@ -1618,7 +1618,7 @@ def power_norm_dFdx_TM(sim, f, dfdHz, dfdEx, dfdEy):
 
     x_all = np.arange(w_pml_l, N-w_pml_r)
     y_all = np.arange(w_pml_b, M-w_pml_t)
-    y_all = y_all.reshape(y_all.shape[0], 1).astype(np.int)
+    y_all = y_all.reshape(y_all.shape[0], 1).astype(int)
 
     dPdHz = np.zeros([M, N], dtype=np.complex128)
     dPdEx = np.zeros([M, N], dtype=np.complex128)

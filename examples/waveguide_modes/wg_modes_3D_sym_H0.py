@@ -40,8 +40,8 @@ h_SOI = 0.22
 # be computed. Ultimately, all we supply is two 2D arrays containing the
 # permittivity and permeability diststriputions. How you create these
 # diststriputions is up to you. Here we use emopt.grid objects to do it.
-strip = emopt.grid.Rectangle(0, H/2, w_wg, h_SOI)
-eps_bg = emopt.grid.Rectangle(W/2, H/2, 2*W, 2*H)
+strip = emopt.geometry.Rectangle(0, H/2, w_wg, h_SOI)
+eps_bg = emopt.geometry.Rectangle(W/2, H/2, 2*W, 2*H)
 
 strip.layer = 1; strip.material_value = eps_Si
 eps_bg.layer = 2; eps_bg.material_value = eps_SiO2

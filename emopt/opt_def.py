@@ -10,23 +10,23 @@ Notes
 -----
 
 Mathematically, the adjoint method calculates the gradient of a function
-:math:`F(\mathbf{E}, \mathbf{H})` which has an explicit dependence on the
-electric and magnetic fields (:math:`\mathbf{E}` and :math:`\mathbf{H}`).
+:math:`F(\\mathbf{E}, \\mathbf{H})` which has an explicit dependence on the
+electric and magnetic fields (:math:`\\mathbf{E}` and :math:`\\mathbf{H}`).
 Assuming we have expressed Maxwell's equations as a discretized linear system
 of equations, one can show [1]_ that the derivatives of :math:`F` are given by
 
 .. math::
-    \\frac{d F}{d p_i} = -2\\Re\\left\{ y^T \\frac{\\partial A}{\\partial p_i} x\\right\\}
+    \\frac{d F}{d p_i} = -2\\Re\\left\\{ y^T \\frac{\\partial A}{\\partial p_i} x\\right\\}
 
 where :math:`x` contains the electric and magnetic fields, :math:`y`
 contains a second set of 'adjoint' fields which are found by solving a second
 set of linear system of equations which consist of the transposed Maxwell's
-equations, and :math:`\partial A / \partial p_i` describes how the materials in
+equations, and :math:`\\partial A / \\partial p_i` describes how the materials in
 the system change with respect to changes to the design variables of the
 system.
 
 The OptDef class does most of the work needed to compute :math:`x`,
-:math:`y`, :math:`\partial A / \partial p_i`, and the gradient
+:math:`y`, :math:`\\partial A / \\partial p_i`, and the gradient
 :math:`\\nabla_\\mathbf{p}F`.
 
 More generally, we may specify a function of which depndends not only on the
@@ -34,13 +34,13 @@ fields, but also explicitly on the design variables. In this case, the function
 is given by
 
 .. math::
-    F \\rightarrow F(\\mathbf{E}, \\mathbf{H}, p_1, p_2, \cdots, p_N)
+    F \\rightarrow F(\\mathbf{E}, \\mathbf{H}, p_1, p_2, \\cdots, p_N)
 
 The derivative of this function with respect to the i'th
 design variable, :math:`p_i` is given by
 
 .. math::
-    \\frac{d F}{d p_i} = -2\\Re\\left\{ y^T
+    \\frac{d F}{d p_i} = -2\\Re\\left\\{ y^T
     \\frac{\\partial A}{\\partial p_i} x\\right\\} + \\frac{\\partial
     F}{\\partial p_i}
 
@@ -91,7 +91,7 @@ example, a custom OptDef class might look like
 
 Here :meth:`.OptDef.update_system` updates the the system based on the
 current set of design parameters, :meth:`.OptDef.calc_fom` calculates
-the value of F(\\mathbf{E}, \\mathbf{H}, y_1, y_2, \cdots, y_N) for the specified
+the value of F(\\mathbf{E}, \\mathbf{H}, y_1, y_2, \\cdots, y_N) for the specified
 set of design parameters in :samp:`params`, :meth:`.OptDef.calc_dFdx`
 calculates the derivative of :math:`F` with respect to the relevant field
 components, and :meth:`.OptDef.calc_grad_y` calculates the gradient of F
@@ -127,7 +127,7 @@ also the permittivity and permeability.  In addition to the functions specified
 above, the user must implement an additional function
 :meth:`.OptDefFM.calc_dFdm` which must compute the derivative of the figure
 of merit :math:`F` with respect to the permittivity and permeability,
-:math:`\epsilon` and :math:`\mu`.  An example of such a function would be, for
+:math:`\\epsilon` and :math:`\\mu`.  An example of such a function would be, for
 example, the total absorption of electromagnetic energy in a domain.
 
 Furthermore, in electromagnetics, efficiencies make common figures of merit.
@@ -180,7 +180,7 @@ class OptDef(metaclass=ABCMeta):
     this function is given by
 
     .. math::
-        \\nabla F = \\nabla_\mathrm{AM} F + \\frac{\partial F}{\partial \\vec{p}}
+        \\nabla F = \\nabla_\\mathrm{AM} F + \\frac{\\partial F}{\\partial \\vec{p}}
 
     where :math:`\\nabla_\\mathrm{AM} F` is the gradient of :math:`F` computed
     using the adjoint method, and the remaining gradient term corresponds to
@@ -204,14 +204,14 @@ class OptDef(metaclass=ABCMeta):
     sim : emopt.solvers.MaxwellSolver
         Simulation object
     step : float
-        Step sized used in the calculation of :math:`\partial A / \partial p_i`
+        Step sized used in the calculation of :math:`\\partial A / \\partial p_i`
 
     Attributes
     ----------
     sim : emopt.solvers.MaxwellSolver
         Simulation object
     step : float
-        Step sized used in the calculation of :math:`\partial A / \partial p_i`
+        Step sized used in the calculation of :math:`\\partial A / \\partial p_i`
 
     Methods
     -------
@@ -319,7 +319,7 @@ class OptDef(metaclass=ABCMeta):
 
         In order to calculate the gradient of the figure of merit, an adjoint
         simulation must first be run.  The sources in the adjoint simulation are
-        given by :math:`\partial F / \partial x` where :math:`F` is the figure of
+        given by :math:`\\partial F / \\partial x` where :math:`F` is the figure of
         merit and :math:`x` is a vector containing the electric and magnetic fields
         contained on a discreter grid.  Because we are differentiating with respect
         to a vector, the resulting derivative will also be a vector.
@@ -435,7 +435,7 @@ class OptDef(metaclass=ABCMeta):
         Returns
         -------
         float
-            **(Master node only)** The figure of merit :math:`F(\mathbf{E},\mathbf{H} ; \mathbf{p})`
+            **(Master node only)** The figure of merit :math:`F(\\mathbf{E},\\mathbf{H} ; \\mathbf{p})`
         """
         # update the system using the design parameters
         self.update_system(params)
@@ -454,16 +454,16 @@ class OptDef(metaclass=ABCMeta):
         The gradient of the figure of merit is computed by running a forward
         simulation, adjoint simulation, and then computing the derivatives of
         the system matrix :math:`A` with respect to the design parameters of
-        the system, i.e. :math:`\partial A / \partial p_i`. In the most general
+        the system, i.e. :math:`\\partial A / \\partial p_i`. In the most general
         case, we can compute this derivative using finite differences. This
         involves perturbing each design variable of the system by a small
         amount one at a time and updating :math:`A`.  Doing so allows us to
         approximate the derivative as
 
         .. math::
-            \\frac{\partial A}{\partial p_i} \\approx \\frac{A(p_i + \Delta p) - A(p_i)}{\Delta p}
+            \\frac{\\partial A}{\\partial p_i} \\approx \\frac{A(p_i + \\Delta p) - A(p_i)}{\\Delta p}
 
-        So long as :math:`\Delta p` is small enough, this approximation is
+        So long as :math:`\\Delta p` is small enough, this approximation is
         quite accurate.
 
         This function handles this process.
@@ -475,7 +475,7 @@ class OptDef(metaclass=ABCMeta):
 
         2. Technically, a centered difference would be more accurate, however
         this whole implementation relies on mesh smoothing which allows us to
-        make very small steps :math:`\Delta p` and thus in reality, the benefit
+        make very small steps :math:`\\Delta p` and thus in reality, the benefit
         is negligable.
 
         Parameters
@@ -514,15 +514,24 @@ class OptDef(metaclass=ABCMeta):
             self.update_system(params)
             if(type(ub[0]) == list or type(ub[0]) == np.ndarray or \
                type(ub[0]) == tuple):
+
+                grad_part = 0
                 for box in ub:
                     self.sim.update(box)
+
+                    # calculate dAdp and assemble the full result on the master node
+                    product = sim.calc_ydAx(Ai, box)
+                    grad_part += -2*np.real( product/step )
+
+                grad_parts.append(grad_part)
+
             else:
                 self.sim.update(ub)
 
-            # calculate dAdp and assemble the full result on the master node
-            product = sim.calc_ydAx(Ai)
-            grad_part = -2*np.real( product/step )
-            grad_parts.append(grad_part)
+                # calculate dAdp and assemble the full result on the master node
+                product = sim.calc_ydAx(Ai, ub)
+                grad_part = -2*np.real( product/step )
+                grad_parts.append(grad_part)
 
             # revert the system to its original state
             params[i] = p0
@@ -620,7 +629,7 @@ class OptDef(metaclass=ABCMeta):
         to which the adjoint method gradient is compared are given by
 
         .. math::
-            \\frac{\partial F}{\partial p_i} \\approx \\frac{F(p_i + \Delta p) - F(p_i)}{\Delta p}
+            \\frac{\\partial F}{\\partial p_i} \\approx \\frac{F(p_i + \\Delta p) - F(p_i)}{\\Delta p}
 
         Note that this method for calculating the gradient is not used in a
         practical setting because it requires performing N+1 simulations in
@@ -710,7 +719,7 @@ class OptDef(metaclass=ABCMeta):
                     ax.xaxis.set_ticks(indices)
                     ax.set_xticklabels(['{ind}'.format(ind=i) for i in indices])
 
-                ax2.set_yscale('log', nonposy='clip')
+                ax2.set_yscale('log')
 
                 for ax in [ax1, ax2]:
                     ax.grid(alpha=0.25)
@@ -961,8 +970,8 @@ class OptDefFM2D(OptDef):
 
     @abstractmethod
     def calc_dFdm(self, sim, params):
-        """Calculate the derivative of F with respect to :math:`\epsilon`,
-        :math:`\epsilon^*`, :math:`\mu`, and :math:`\mu^*`
+        """Calculate the derivative of F with respect to :math:`\\epsilon`,
+        :math:`\\epsilon^*`, :math:`\\mu`, and :math:`\\mu^*`
 
         Parameters
         ----------
@@ -1060,7 +1069,8 @@ class OptDefFM2D(OptDef):
             # We also need dAdp to account for the derivative of eps and mu
             # get the updated diagonal elements of A
             Af = sim.get_A_diag(Af)
-            dAdp = (Af-Ai)/step
+            A_diff = Af-Ai
+            dAdp = A_diff/step
             gatherer, dAdp_full = PETSc.Scatter().toZero(dAdp)
             gatherer.scatter(dAdp, dAdp_full, False, PETSc.Scatter.Mode.FORWARD)
 
@@ -1103,7 +1113,11 @@ class OptDefFM2D(OptDef):
                                       np.conj(dmudp[imin:imax, jmin:jmax])) \
                                )
 
-            # revert the system to its original state
+            ## revert the system to its original state
+            dAdp.destroy()
+            dAdp_full.destroy()
+            A_diff.destroy()
+            dAdp.destroy()
             params[i] = p0
             self.update_system(params)
             if(type(ub[0]) == list or type(ub[0]) == np.ndarray or \
@@ -1124,7 +1138,7 @@ class OptDefPNF2D(OptDefFM2D):
 
     .. math::
         F(\\mathbf{E}, \\mathbf{H}, \\epsilon, \\mu) = \\frac{f(\\mathbf{E},
-        \\mathbf{H})} {P_\mathrm{src}(\\mathbf{E}, \\mathbf{H}, \\epsilon, \\mu)}
+        \\mathbf{H})} {P_\\mathrm{src}(\\mathbf{E}, \\mathbf{H}, \\epsilon, \\mu)}
 
     where :math:`\\epsilon` and :math:`\\mu` are the permittivity and
     permeability and :math:`f(...)` is a figure of merit which depends only on
@@ -1252,8 +1266,8 @@ class OptDefPNF2D(OptDefFM2D):
         Returns
         -------
         list of numpy.ndarray
-            (Master node only) The derivative of F with respect to :math:`\epsilon`,
-            :math:`\epsilon^*`, :math:`\mu`, and :math:`\mu^*`
+            (Master node only) The derivative of F with respect to :math:`\\epsilon`,
+            :math:`\\epsilon^*`, :math:`\\mu`, and :math:`\\mu^*`
         """
         # isinstance(sim, solvers.Maxwell2DTM) must come before TE since TM is a
         # subclass of TE
