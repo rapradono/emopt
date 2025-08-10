@@ -1,3 +1,14 @@
+Released on August 10, 2025
+---------------------------
+1. Installation process reworked to use configure and makefiles scripts. To install emopt, run:
+   $ ./configure
+   $ make
+   $ make install
+2. Added a slightly modified version of psunsd's CUDA-accelerated version of emopt (emopt.solvers.fdtd_fpu).
+This version includes some memory leak fixes + retains the original grid smoothing with improvements to make
+it run much faster.
+3. Fixed bugs in/associated with examples.
+
 Released on 
 -----------
 This is a major update that will break scripts written with earlier version of EMopt. Please

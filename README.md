@@ -26,6 +26,8 @@ added.
 ## Authors
 Andrew Michaels 
 
+Peng Sun
+
 ## License
 EMOpt is currently released under the GPL license (see LICENSE.md for details)
 
