@@ -816,7 +816,7 @@ class ParameterizedPolygon(Polygon):
             self._xparam[selection_name] = list(set(self._xparam[selection_name]) | set(ix))
             self._yparam[selection_name] = list(set(self._yparam[selection_name]) | set(iy))
 
-    def get_param_bboxes(self):
+    def get_param_bboxes(self, padding=0, include_z_cols=False):
         """Get the bounding boxes of the parameterized vertices.
 
         These 'bounding boxes' encompass the parameterized point and its adjacent points.
@@ -844,10 +844,13 @@ class ParameterizedPolygon(Polygon):
 
             N = len(inds)
             bboxes = np.zeros((N, 4))
-            bboxes[:, 0] = np.min(xs, axis=0)
-            bboxes[:, 1] = np.max(xs, axis=0)
-            bboxes[:, 2] = np.min(ys, axis=0)
-            bboxes[:, 3] = np.max(ys, axis=0)
+            bboxes[:, 0] = np.min(xs, axis=0) - padding
+            bboxes[:, 1] = np.max(xs, axis=0) + padding
+            bboxes[:, 2] = np.min(ys, axis=0) - padding
+            bboxes[:, 3] = np.max(ys, axis=0) + padding
+
+            if include_z_cols:
+                bboxes = np.hstack((bboxes, np.zeros((N, 2))))
 
             bboxes_x[name] = bboxes
 
@@ -861,10 +864,13 @@ class ParameterizedPolygon(Polygon):
 
             N = len(inds)
             bboxes = np.zeros((N, 4))
-            bboxes[:, 0] = np.min(xs, axis=0)
-            bboxes[:, 1] = np.max(xs, axis=0)
-            bboxes[:, 2] = np.min(ys, axis=0)
-            bboxes[:, 3] = np.max(ys, axis=0)
+            bboxes[:, 0] = np.min(xs, axis=0) - padding
+            bboxes[:, 1] = np.max(xs, axis=0) + padding
+            bboxes[:, 2] = np.min(ys, axis=0) - padding
+            bboxes[:, 3] = np.max(ys, axis=0) + padding
+
+            if include_z_cols:
+                bboxes = np.hstack((bboxes, np.zeros((N, 2))))
 
             bboxes_y[name] = bboxes
 
