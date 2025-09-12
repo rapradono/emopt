@@ -3186,7 +3186,7 @@ rm -r build
 
 pip install numpy mpi4py
 PETSC_DIR=$prefix PETSC_ARCH= pip install petsc4py==$PETSC_VERSION
-SLEPC_DIR=$prefix PETSC_ARCH= pip install slepc4py==$SLEPC_VERSION
+SLEPC_DIR=$prefix PETSC_DIR=$prefix PETSC_ARCH= pip install slepc4py==$SLEPC_VERSION
 
 EIGEN_DIR=$prefix/include
 

@@ -155,7 +155,7 @@ rm -r build
 dnl Certain python dependencies for emopt need special treatment
 pip install numpy mpi4py
 PETSC_DIR=$prefix PETSC_ARCH= pip install petsc4py==$PETSC_VERSION
-SLEPC_DIR=$prefix PETSC_ARCH= pip install slepc4py==$SLEPC_VERSION
+SLEPC_DIR=$prefix PETSC_DIR=$prefix PETSC_ARCH= pip install slepc4py==$SLEPC_VERSION
 
 dnl output Makefile
 AC_SUBST(EIGEN_DIR, [$prefix/include])
