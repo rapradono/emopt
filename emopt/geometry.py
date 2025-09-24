@@ -230,7 +230,7 @@ class Polygon(MaterialPrimitive):
                 yf = np.concatenate([yf, [y1, y2]])
             else:
                 s = np.sqrt((x2-x1)**2 + (y2-y1)**2)
-                Ns = np.ceil(s/ds)
+                Ns = int(np.ceil(s/ds))
                 if(Ns < 2): Ns = 2
 
                 xnew = np.linspace(x1, x2, Ns)
