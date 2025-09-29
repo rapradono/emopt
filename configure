@@ -2078,8 +2078,8 @@ then
 fi
 
 BOOST_VERSION=1_73_0
-PETSC_VERSION=3.23.4
-SLEPC_VERSION=3.23.0
+PETSC_VERSION=3.23.6
+SLEPC_VERSION=3.23.3
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -3113,6 +3113,7 @@ printf "%s\n" "$as_me: Compiling PETSc..." >&6;}
 	./configure --with-scalar-type=complex --with-mpi=1 --COPTFLAGS='-O3' \
 		    --FOPTFLAGS='-O3' --CXXOPTFLAGS='-O3' --with-debugging=0 \
 		    --prefix=$prefix --download-scalapack --download-mumps --download-fblaslapack=1 \
+		    --download-parmetis --download-metis --download-ptscotch \
 		    $download_cmake
 	make all
 	make install
@@ -3165,7 +3166,7 @@ printf "%s\n" "$as_me: SLEPc is not installed. Building it now. This may take a 
 		{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: https://slepc.upv.es/download/distrib/slepc-$SLEPC_VERSION.tar.gz" >&5
 printf "%s\n" "$as_me: https://slepc.upv.es/download/distrib/slepc-$SLEPC_VERSION.tar.gz" >&6;}
 	curl --output slepc.tar.gz "https://slepc.upv.es/download/distrib/slepc-$SLEPC_VERSION.tar.gz"
-	tar xvzf slepc.tar.gz
+	tar xzf slepc.tar.gz
 	cd slepc-$SLEPC_VERSION
 
 	./configure --prefix=$prefix

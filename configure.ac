@@ -7,8 +7,8 @@ fi
 
 dnl Dependency versions
 BOOST_VERSION=1_73_0
-PETSC_VERSION=3.23.4
-SLEPC_VERSION=3.23.0
+PETSC_VERSION=3.23.6
+SLEPC_VERSION=3.23.3
 
 dnl check dependencies needed to compile petsc and slepc
 AC_LANG([C++])
@@ -108,6 +108,7 @@ then
 	./configure --with-scalar-type=complex --with-mpi=1 --COPTFLAGS='-O3' \
 		    --FOPTFLAGS='-O3' --CXXOPTFLAGS='-O3' --with-debugging=0 \
 		    --prefix=$prefix --download-scalapack --download-mumps --download-fblaslapack=1 \
+		    --download-parmetis --download-metis --download-ptscotch \
 		    $download_cmake
 	make all
 	make install
@@ -133,7 +134,7 @@ then
 	dnl download SLEPc
 	AC_MSG_NOTICE(https://slepc.upv.es/download/distrib/slepc-$SLEPC_VERSION.tar.gz)
 	curl --output slepc.tar.gz "https://slepc.upv.es/download/distrib/slepc-$SLEPC_VERSION.tar.gz"
-	tar xvzf slepc.tar.gz
+	tar xzf slepc.tar.gz
 	cd slepc-$SLEPC_VERSION
 
 	./configure --prefix=$prefix
