@@ -357,6 +357,11 @@ class Mode1DTE(ModeSolver):
         self.ib = ib
         self.ie = ie
 
+    def __del__(self):
+        self._A.destroy()
+        self._B.destroy()
+        self._solver.destroy()
+
     @property
     def dir(self):
         return self._dir
@@ -1190,6 +1195,12 @@ class Mode2D(ModeSolver):
         # non-dimensionalization for spatial variables
         self.R = self.wavelength/(2*np.pi)
 
+        # Set the ordering method -- this is important to ensure solver stability
+        options = PETSc.Options()
+        if 'mat_mumps_icntl_28' not in options:
+            options.setValue('mat_mumps_icntl_28', 2) 
+            options.setValue('mat_mumps_icntl_29', 1) 
+
         # Solve problem of the form Ax = nBx
         # define A and B matrices here
         # 6 fields
@@ -1251,6 +1262,11 @@ class Mode2D(ModeSolver):
 
         # Boundary conditions default to PEC
         self._bc = ['0', '0']
+
+    def __del__(self):
+        self._A.destroy()
+        self._B.destroy()
+        self._solver.destroy()
 
     @property
     def bc(self):
