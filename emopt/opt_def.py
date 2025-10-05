@@ -936,7 +936,7 @@ class OptDefMO(OptDef, metaclass=ABCMeta):
         """
         # we override this function so we can initially update all of the ams
         # as desired
-        self.sim = self._ams[0].sim
+        self.sim = self._ods[0].sim
         for od in self._ods:
             od.update_system(params)
             od.sim.update()
