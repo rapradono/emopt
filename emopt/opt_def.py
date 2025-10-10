@@ -941,10 +941,10 @@ class OptDefMO(OptDef, metaclass=ABCMeta):
             od.update_system(params)
             od.sim.update()
 
-        return super(OptDefMO, self).check_gradient(params, indices, plot,
-                                                           verbose,
-                                                           return_gradients,
-                                                           fd_step)
+        return super().check_gradient(params, indices=indices, plot=plot,
+                                      verbose=verbose,
+                                      return_gradients=return_gradients,
+                                      fd_step=fd_step)
 
 class OptDefFM2D(OptDef):
     """Define an :class:`.OptDef` which simplifies the calculation of

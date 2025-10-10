@@ -88,7 +88,7 @@ typedef struct kernelparams {
     size_t size;
     size_t ghost_size, buffer_size;
     char *bc;
-    double odx, dt, src_t;
+    double odx, ody, odz, dt, src_t;
     int *i0s, *j0s, *k0s, *Is, *Js, *Ks, srclen;
     double src_T, src_min, src_k;
 

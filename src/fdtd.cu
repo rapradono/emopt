@@ -297,12 +297,12 @@ __global__ void kernel_update_H(kernelpar *kpar)
         kpar->Ey[ind_ijk] = 0.0;
     }
 
-    dEzdy = kpar->odx * (kpar->Ez[ind_ijp1k] - kpar->Ez[ind_ijk]);
-    dEydz = kpar->odx * (kpar->Ey[ind_ip1jk] - kpar->Ey[ind_ijk]);
-    dExdz = kpar->odx * (kpar->Ex[ind_ip1jk] - kpar->Ex[ind_ijk]);
+    dEzdy = kpar->ody * (kpar->Ez[ind_ijp1k] - kpar->Ez[ind_ijk]);
+    dEydz = kpar->odz * (kpar->Ey[ind_ip1jk] - kpar->Ey[ind_ijk]);
+    dExdz = kpar->odz * (kpar->Ex[ind_ip1jk] - kpar->Ex[ind_ijk]);
     dEzdx = kpar->odx * (kpar->Ez[ind_ijkp1] - kpar->Ez[ind_ijk]);
     dEydx = kpar->odx * (kpar->Ey[ind_ijkp1] - kpar->Ey[ind_ijk]);
-    dExdy = kpar->odx * (kpar->Ex[ind_ijp1k] - kpar->Ex[ind_ijk]);
+    dExdy = kpar->ody * (kpar->Ex[ind_ijp1k] - kpar->Ex[ind_ijk]);
     kpar->Hx[ind_ijk] = kpar->Hx[ind_ijk] + kpar->dt * (dEydz - dEzdy);
     kpar->Hy[ind_ijk] = kpar->Hy[ind_ijk] + kpar->dt * (dEzdx - dExdz);
     kpar->Hz[ind_ijk] = kpar->Hz[ind_ijk] + kpar->dt * (dExdy - dEydx);
@@ -495,12 +495,12 @@ __global__ void kernel_update_E(kernelpar *kpar)
     b_x = kpar->dt/kpar->epsx[ind_global].real;
     b_y = kpar->dt/kpar->epsy[ind_global].real;
     b_z = kpar->dt/kpar->epsz[ind_global].real;
-    dHzdy = kpar->odx * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijm1k]);
-    dHydz = kpar->odx * (kpar->Hy[ind_ijk] - kpar->Hy[ind_im1jk]);
-    dHxdz = kpar->odx * (kpar->Hx[ind_ijk] - kpar->Hx[ind_im1jk]);
+    dHzdy = kpar->ody * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijm1k]);
+    dHydz = kpar->odz * (kpar->Hy[ind_ijk] - kpar->Hy[ind_im1jk]);
+    dHxdz = kpar->odz * (kpar->Hx[ind_ijk] - kpar->Hx[ind_im1jk]);
     dHzdx = kpar->odx * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijkm1]);
     dHydx = kpar->odx * (kpar->Hy[ind_ijk] - kpar->Hy[ind_ijkm1]);
-    dHxdy = kpar->odx * (kpar->Hx[ind_ijk] - kpar->Hx[ind_ijm1k]);
+    dHxdy = kpar->ody * (kpar->Hx[ind_ijk] - kpar->Hx[ind_ijm1k]);
     kpar->Ex[ind_ijk] = kpar->Ex[ind_ijk] + b_x * (dHzdy - dHydz);
     kpar->Ey[ind_ijk] = kpar->Ey[ind_ijk] + b_y * (dHxdz - dHzdx);
     kpar->Ez[ind_ijk] = kpar->Ez[ind_ijk] + b_z * (dHydx - dHxdy);
@@ -664,12 +664,12 @@ __global__ void kernel_update_H_bulk(kernelpar *kpar)
         kpar->Ey[ind_ijk] = 0.0;
     }
 
-    dEzdy = kpar->odx * (kpar->Ez[ind_ijp1k] - kpar->Ez[ind_ijk]);
-    dEydz = kpar->odx * (kpar->Ey[ind_ip1jk] - kpar->Ey[ind_ijk]);
-    dExdz = kpar->odx * (kpar->Ex[ind_ip1jk] - kpar->Ex[ind_ijk]);
+    dEzdy = kpar->ody * (kpar->Ez[ind_ijp1k] - kpar->Ez[ind_ijk]);
+    dEydz = kpar->odz * (kpar->Ey[ind_ip1jk] - kpar->Ey[ind_ijk]);
+    dExdz = kpar->odz * (kpar->Ex[ind_ip1jk] - kpar->Ex[ind_ijk]);
     dEzdx = kpar->odx * (kpar->Ez[ind_ijkp1] - kpar->Ez[ind_ijk]);
     dEydx = kpar->odx * (kpar->Ey[ind_ijkp1] - kpar->Ey[ind_ijk]);
-    dExdy = kpar->odx * (kpar->Ex[ind_ijp1k] - kpar->Ex[ind_ijk]);
+    dExdy = kpar->ody * (kpar->Ex[ind_ijp1k] - kpar->Ex[ind_ijk]);
     kpar->Hx[ind_ijk] = kpar->Hx[ind_ijk] + kpar->dt * (dEydz - dEzdy);
     kpar->Hy[ind_ijk] = kpar->Hy[ind_ijk] + kpar->dt * (dEzdx - dExdz);
     kpar->Hz[ind_ijk] = kpar->Hz[ind_ijk] + kpar->dt * (dExdy - dEydx);
@@ -836,12 +836,12 @@ __global__ void kernel_update_H_border(kernelpar *kpar)
         kpar->Ey[ind_ijk] = 0.0;
     }
 
-    dEzdy = kpar->odx * (kpar->Ez[ind_ijp1k] - kpar->Ez[ind_ijk]);
-    dEydz = kpar->odx * (kpar->Ey[ind_ip1jk] - kpar->Ey[ind_ijk]);
-    dExdz = kpar->odx * (kpar->Ex[ind_ip1jk] - kpar->Ex[ind_ijk]);
+    dEzdy = kpar->ody * (kpar->Ez[ind_ijp1k] - kpar->Ez[ind_ijk]);
+    dEydz = kpar->odz * (kpar->Ey[ind_ip1jk] - kpar->Ey[ind_ijk]);
+    dExdz = kpar->odz * (kpar->Ex[ind_ip1jk] - kpar->Ex[ind_ijk]);
     dEzdx = kpar->odx * (kpar->Ez[ind_ijkp1] - kpar->Ez[ind_ijk]);
     dEydx = kpar->odx * (kpar->Ey[ind_ijkp1] - kpar->Ey[ind_ijk]);
-    dExdy = kpar->odx * (kpar->Ex[ind_ijp1k] - kpar->Ex[ind_ijk]);
+    dExdy = kpar->ody * (kpar->Ex[ind_ijp1k] - kpar->Ex[ind_ijk]);
     kpar->Hx[ind_ijk] = kpar->Hx[ind_ijk] + kpar->dt * (dEydz - dEzdy);
     kpar->Hy[ind_ijk] = kpar->Hy[ind_ijk] + kpar->dt * (dEzdx - dExdz);
     kpar->Hz[ind_ijk] = kpar->Hz[ind_ijk] + kpar->dt * (dExdy - dEydx);
@@ -1257,12 +1257,12 @@ __global__ void kernel_update_E_bulk(kernelpar *kpar)
     b_x = kpar->dt/kpar->epsx[ind_global].real;
     b_y = kpar->dt/kpar->epsy[ind_global].real;
     b_z = kpar->dt/kpar->epsz[ind_global].real;
-    dHzdy = kpar->odx * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijm1k]);
-    dHydz = kpar->odx * (kpar->Hy[ind_ijk] - kpar->Hy[ind_im1jk]);
-    dHxdz = kpar->odx * (kpar->Hx[ind_ijk] - kpar->Hx[ind_im1jk]);
+    dHzdy = kpar->ody * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijm1k]);
+    dHydz = kpar->odz * (kpar->Hy[ind_ijk] - kpar->Hy[ind_im1jk]);
+    dHxdz = kpar->odz * (kpar->Hx[ind_ijk] - kpar->Hx[ind_im1jk]);
     dHzdx = kpar->odx * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijkm1]);
     dHydx = kpar->odx * (kpar->Hy[ind_ijk] - kpar->Hy[ind_ijkm1]);
-    dHxdy = kpar->odx * (kpar->Hx[ind_ijk] - kpar->Hx[ind_ijm1k]);
+    dHxdy = kpar->ody * (kpar->Hx[ind_ijk] - kpar->Hx[ind_ijm1k]);
     kpar->Ex[ind_ijk] = kpar->Ex[ind_ijk] + b_x * (dHzdy - dHydz);
     kpar->Ey[ind_ijk] = kpar->Ey[ind_ijk] + b_y * (dHxdz - dHzdx);
     kpar->Ez[ind_ijk] = kpar->Ez[ind_ijk] + b_z * (dHydx - dHxdy);
@@ -1465,12 +1465,12 @@ __global__ void kernel_update_E_border(kernelpar *kpar)
     b_x = kpar->dt/kpar->epsx[ind_border].real;
     b_y = kpar->dt/kpar->epsy[ind_border].real;
     b_z = kpar->dt/kpar->epsz[ind_border].real;
-    dHzdy = kpar->odx * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijm1k]);
-    dHydz = kpar->odx * (kpar->Hy[ind_ijk] - kpar->Hy[ind_im1jk]);
-    dHxdz = kpar->odx * (kpar->Hx[ind_ijk] - kpar->Hx[ind_im1jk]);
+    dHzdy = kpar->ody * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijm1k]);
+    dHydz = kpar->odz * (kpar->Hy[ind_ijk] - kpar->Hy[ind_im1jk]);
+    dHxdz = kpar->odz * (kpar->Hx[ind_ijk] - kpar->Hx[ind_im1jk]);
     dHzdx = kpar->odx * (kpar->Hz[ind_ijk] - kpar->Hz[ind_ijkm1]);
     dHydx = kpar->odx * (kpar->Hy[ind_ijk] - kpar->Hy[ind_ijkm1]);
-    dHxdy = kpar->odx * (kpar->Hx[ind_ijk] - kpar->Hx[ind_ijm1k]);
+    dHxdy = kpar->ody * (kpar->Hx[ind_ijk] - kpar->Hx[ind_ijm1k]);
     kpar->Ex[ind_ijk] = kpar->Ex[ind_ijk] + b_x * (dHzdy - dHydz);
     kpar->Ey[ind_ijk] = kpar->Ey[ind_ijk] + b_y * (dHxdz - dHzdx);
     kpar->Ez[ind_ijk] = kpar->Ez[ind_ijk] + b_z * (dHydx - dHxdy);
@@ -2026,6 +2026,8 @@ void fdtd::FDTD::block_CUDA_multigpu_init()
         _kpar_host->i0 = i0t; _kpar_host->j0 = j0t; _kpar_host->k0 = k0t;
         _kpar_host->size = _kpar_host->I * _kpar_host->J * _kpar_host->K;
         _kpar_host->odx = _R/_dx;
+        _kpar_host->ody = _R/_dy;
+        _kpar_host->odz = _R/_dz;
         _kpar_host->ghost_size = _ghost_size;
         _kpar_host->buffer_size = _buffer_size;
 
@@ -2684,6 +2686,8 @@ void fdtd::FDTD::update_H(int n, double t)
     _kpar_host->pml_zmin = pml_zmin;
     _kpar_host->pml_zmax = pml_zmax;
     _kpar_host->odx = odx;
+    _kpar_host->ody = ody;
+    _kpar_host->odz = odz;
     _kpar_host->t = t;
     _kpar_host->src_T = _src_T;
     _kpar_host->src_min = _src_min;
@@ -3342,6 +3346,8 @@ void fdtd::FDTD::solve()
 void fdtd::FDTD::update_E(int n, double t)
 {
     double odx = _R/_dx;
+    double ody = _R/_dy;
+    double odz = _R/_dz;
 
     int pml_xmin = _w_pml_x0, pml_xmax = _Nx-_w_pml_x1,
         pml_ymin = _w_pml_y0, pml_ymax = _Ny-_w_pml_y1,
@@ -3354,6 +3360,8 @@ void fdtd::FDTD::update_E(int n, double t)
     _kpar_host->pml_zmin = pml_zmin;
     _kpar_host->pml_zmax = pml_zmax;
     _kpar_host->odx = odx;
+    _kpar_host->ody = ody;
+    _kpar_host->odz = odz;
     _kpar_host->t = t;
     _kpar_host->src_T = _src_T;
     _kpar_host->src_min = _src_min;
