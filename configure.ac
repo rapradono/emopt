@@ -143,7 +143,8 @@ then
 	make SLEPC_DIR=$SLEPC_DIR PETSC_DIR=$PETSC_DIR PETSC_ARCH=$PETSC_ARCH check
 
 	cd ..
-	rm -r slepc-$SLEPC_VERSION
+	rm -r slepc
+	cd ..
 
 else
 	AC_MSG_NOTICE(SLEPc is already installed to prefix. Skipping...)
