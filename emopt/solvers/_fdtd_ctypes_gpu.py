@@ -26,6 +26,9 @@ c_double_p = ndpointer(np.double, ndim=1, flags='C')
 libFDTD.FDTD_new.argtypes = []
 libFDTD.FDTD_new.restype = c_void_p
 
+libFDTD.FDTD_delete.argtypes = [c_void_p]
+libFDTD.FDTD_delete.restype = None
+
 libFDTD.FDTD_set_wavelength.argtypes = [c_void_p, c_double]
 libFDTD.FDTD_set_wavelength.restype = None
 

@@ -2246,6 +2246,17 @@ class Mode2D(ModeSolver):
         Ex = Ex/np.sqrt(S); Ey = Ey/np.sqrt(S); Ez = Ez/np.sqrt(S)
         Hx = Hx/np.sqrt(S); Hy = Hy/np.sqrt(S); Hz = Hz/np.sqrt(S)
 
+        # Constrain the phase such that the dominant field component has zero average phase
+        # The mode solver does not guarantee an absolute phase for the mode
+        # Constraining it here can help in certain situations (e.g. S-parameter calcs)
+        fields = [Ex, Ey, Ez, Hx, Hy, Hz]
+        Is = [np.sum(np.abs(field)**2) for field in fields]
+        ind = np.argmax(Is)
+        phase = np.sum(np.angle(fields[ind]) * np.abs(fields[ind])**2) / np.sum(np.abs(fields[ind])**2)
+
+        for field in fields:
+            field *= np.exp(-1j*phase)
+
         if(NOT_PARALLEL):
             ## Calculate contribution of Ex
             Ex = np.pad(Ex, 1, 'constant', constant_values=0)

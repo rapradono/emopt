@@ -4258,6 +4258,10 @@ fdtd::FDTD* FDTD_new()
     return new fdtd::FDTD();
 }
 
+void FDTD_delete(fdtd::FDTD* fdtd) {
+    delete fdtd;
+}
+
 void FDTD_set_wavelength(fdtd::FDTD* fdtd, double wavelength)
 {
     fdtd->set_wavelength(wavelength);

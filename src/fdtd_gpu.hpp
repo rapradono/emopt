@@ -719,6 +719,7 @@ namespace fdtd {
 
 extern "C" {
         fdtd::FDTD* FDTD_new();
+        void FDTD_delete(fdtd::FDTD* fdtd);
 
 
         void FDTD_set_wavelength(fdtd::FDTD* fdtd, double wavelength);

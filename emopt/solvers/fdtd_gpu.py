@@ -440,6 +440,63 @@ class Maxwell3D(MaxwellSolver):
         self.forward_count = 0
         self.adjoint_count = 0
 
+    def __del__(self):
+        libFDTD.FDTD_delete(self._libfdtd)
+
+        self._eps_x.destroy()
+        self._eps_y.destroy()
+        self._eps_z.destroy()
+
+        if hasattr(self, "_Ex_fwd_t0") == True:
+            self._Ex_fwd_t0.destroy()
+            self._Ey_fwd_t0.destroy()
+            self._Ez_fwd_t0.destroy()
+            self._Hx_fwd_t0.destroy()
+            self._Hy_fwd_t0.destroy()
+            self._Hz_fwd_t0.destroy()
+
+        if hasattr(self, "_Ex_fwd_t0_pbox") == True:
+            self._Ex_fwd_t0_pbox.destroy()
+            self._Ey_fwd_t0_pbox.destroy()
+            self._Ez_fwd_t0_pbox.destroy()
+            self._Hx_fwd_t0_pbox.destroy()
+            self._Hy_fwd_t0_pbox.destroy()
+            self._Hz_fwd_t0_pbox.destroy()
+
+        if hasattr(self, "_Ex_fwd_t1") == True:
+            self._Ex_fwd_t1.destroy()
+            self._Ey_fwd_t1.destroy()
+            self._Ez_fwd_t1.destroy()
+            self._Hx_fwd_t1.destroy()
+            self._Hy_fwd_t1.destroy()
+            self._Hz_fwd_t1.destroy()
+
+        if hasattr(self, "_Ex_adj_t0") == True:
+            self._Ex_adj_t0.destroy()
+            self._Ey_adj_t0.destroy()
+            self._Ez_adj_t0.destroy()
+            self._Hx_adj_t0.destroy()
+            self._Hy_adj_t0.destroy()
+            self._Hz_adj_t0.destroy()
+
+        if hasattr(self, "_Ex_adj_t1") == True:
+            self._Ex_adj_t1.destroy()
+            self._Ey_adj_t1.destroy()
+            self._Ez_adj_t1.destroy()
+            self._Hx_adj_t1.destroy()
+            self._Hy_adj_t1.destroy()
+            self._Hz_adj_t1.destroy()
+
+        if hasattr(self, "_Ex_adj_t0_pbox") == True:
+            self._Ex_adj_t0_pbox.destroy()
+            self._Ey_adj_t0_pbox.destroy()
+            self._Ez_adj_t0_pbox.destroy()
+            self._Hx_adj_t0_pbox.destroy()
+            self._Hy_adj_t0_pbox.destroy()
+            self._Hz_adj_t0_pbox.destroy()
+
+        del self._Ex, self._Ey, self._Ez, self._Hx, self._Hy, self._Hz
+
     @property
     def wavelength(self):
         return self._wavelength
