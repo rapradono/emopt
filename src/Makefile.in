@@ -20,7 +20,7 @@ LDFLAGS = @LDFLAGS@ -lpthread
 all: Grid.o Grid_ctypes.o Grid.cpp Grid.hpp Grid_ctypes.cpp Grid_ctypes.hpp fdtd.o fdtd.cpp fdtd.hpp fdtd.cu
 	${CXX} ${SHARED_FLAG} -fopenmp -fPIC -o Grid.so Grid.o Grid_ctypes.o ${LDFLAGS}
 	${CXX} ${SHARED_FLAG} -fopenmp -fPIC -o FDTD.so fdtd.o ${LDFLAGS}
-	${NVCC} -Xcompiler -fPIC -O3 -std=c++17 -arch=native -shared fdtd.cu -o FDTD_gpu.so
+	${NVCC} -Xcompiler -fPIC -O3 -std=c++17 -arch=all -shared fdtd.cu -o FDTD_gpu.so
 	cp Grid.so ../emopt
 	cp FDTD.so ../emopt/solvers
 	cp FDTD_gpu.so ../emopt/solvers

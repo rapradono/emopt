@@ -2242,20 +2242,9 @@ class Mode2D(ModeSolver):
         Hz = self.get_field(i, FieldComponent.Hz, permute=False, squeeze=True)
 
         # normalize power to ~1.0 -- not really necessary
-        S = 0.5*mydx*mydy*np.sum(Ex*np.conj(Hy)-Ey*np.conj(Hx))
+        S = 0.5*mydx*mydy*np.real(np.sum(Ex*np.conj(Hy)-Ey*np.conj(Hx)))
         Ex = Ex/np.sqrt(S); Ey = Ey/np.sqrt(S); Ez = Ez/np.sqrt(S)
         Hx = Hx/np.sqrt(S); Hy = Hy/np.sqrt(S); Hz = Hz/np.sqrt(S)
-
-        # Constrain the phase such that the dominant field component has zero average phase
-        # The mode solver does not guarantee an absolute phase for the mode
-        # Constraining it here can help in certain situations (e.g. S-parameter calcs)
-        fields = [Ex, Ey, Ez, Hx, Hy, Hz]
-        Is = [np.sum(np.abs(field)**2) for field in fields]
-        ind = np.argmax(Is)
-        phase = np.sum(np.angle(fields[ind]) * np.abs(fields[ind])**2) / np.sum(np.abs(fields[ind])**2)
-
-        for field in fields:
-            field *= np.exp(-1j*phase)
 
         if(NOT_PARALLEL):
             ## Calculate contribution of Ex
@@ -2307,6 +2296,21 @@ class Mode2D(ModeSolver):
             Mx = np.reshape(Mx, self.domain.shape)
             My = np.reshape(My, self.domain.shape)
             Mz = np.reshape(Mz, self.domain.shape)
+
+            # Constrain the phase such that the dominant source component has zero average phase
+            # The mode solver does not guarantee an absolute phase for the mode
+            # Constraining it here can help in certain situations (e.g. S-parameter calcs)
+            fields = [Ex, Ey, Ez]
+            Is = [np.sum(np.abs(field)**2) for field in fields]
+            ind = np.argmax(Is)
+
+            srcs = [Jx, Jy, Jz, Mx, My, Mz]
+            src_angle = np.angle(srcs[ind])
+            src_I = np.abs(srcs[ind])**2
+            phase = np.percentile(src_angle[src_I > np.mean(src_I)], 51.0)
+
+            for src in srcs:
+                src*= np.exp(-1j*phase)
 
         # permute (if necessary) and return the results
         if(self.ndir == 'x'):
