@@ -2,19 +2,6 @@ from setuptools import setup, find_packages
 from setuptools.command.install import install
 import subprocess, os, sys, shutil
 
-class RunMake(install):
-    def run(self):
-        # Compile C++ components of EMopt
-        # First check if Eigen is installed. If it isn't, we will just download it since it
-        # is a header-only library
-        if(not os.path.exists('/usr/include/eigen3')):
-            EIGEN_VERSION = '3.3.9'
-            subprocess.call(['git', 'clone', '--branch', EIGEN_VERSION, 'https://gitlab.com/libeigen/eigen.git'])
-            shutil.copytree('eigen/Eigen', 'src/Eigen')
-            
-        subprocess.call(['make'])
-        install.run(self)
-
 def get_version_number():
     base_dir = os.path.dirname(os.path.realpath(__file__))
     with open(base_dir + '/emopt/__init__.py', 'r') as fin:
@@ -35,6 +22,5 @@ setup(name='emopt',
       packages=find_packages(),
       package_data={'emopt':['*.so', '*.csv', 'data/*', 'solvers/*.so']},
       include_package_data=True,
-      cmdclass={'install':RunMake},
       install_requires=['numpy', 'scipy', 'matplotlib', 'mpi4py', 'petsc4py', 'slepc4py'],
       zip_safe=False)
