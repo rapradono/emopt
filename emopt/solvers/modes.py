@@ -1266,6 +1266,8 @@ class Mode2D(ModeSolver):
     def __del__(self):
         self._A.destroy()
         self._B.destroy()
+        for x in self._x:
+            x.destroy()
         self._solver.destroy()
 
     @property
@@ -1972,7 +1974,7 @@ class Mode2D(ModeSolver):
                 return Hx[1:-1, 1:-1]/4.0
 
             elif(component == FieldComponent.Hy): # Hy --> don't average
-                return f_raw
+                return f_raw[1:-1, 1:-1]
 
             elif(component == FieldComponent.Hz): # Hz --> average along x
                 Hz = np.copy(f_raw)
@@ -2242,7 +2244,10 @@ class Mode2D(ModeSolver):
         Hz = self.get_field(i, FieldComponent.Hz, permute=False, squeeze=True)
 
         # normalize power to ~1.0 -- not really necessary
-        S = 0.5*mydx*mydy*np.real(np.sum(Ex*np.conj(Hy)-Ey*np.conj(Hx)))
+        Sx = 0.5*mydy*mydz*np.real(np.sum(Ey*np.conj(Hz)-Ez*np.conj(Hy)))
+        Sy = 0.5*mydx*mydz*np.real(np.sum(-Ex*np.conj(Hz)+Ez*np.conj(Hx)))
+        Sz = 0.5*mydx*mydy*np.real(np.sum(Ex*np.conj(Hy)-Ey*np.conj(Hx)))
+        S = np.sqrt(Sx**2+Sy**2+Sz**2)
         Ex = Ex/np.sqrt(S); Ey = Ey/np.sqrt(S); Ez = Ez/np.sqrt(S)
         Hx = Hx/np.sqrt(S); Hy = Hy/np.sqrt(S); Hz = Hz/np.sqrt(S)
 
