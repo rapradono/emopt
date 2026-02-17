@@ -1404,7 +1404,9 @@ class Maxwell2DTE(Maxwell2D):
         self.get_A_diag(Adiag1)
 
         product = y * (Adiag1-Adiag0) * x
-        return np.sum(product[...])
+        res = np.sum(product[...])
+        product.destroy()
+        return res
 
 class Maxwell2DTM(Maxwell2DTE):
     """Simulate Maxwell's equations in 2D with TM-polarized fields.

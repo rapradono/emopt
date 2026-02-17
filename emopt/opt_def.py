@@ -1127,6 +1127,8 @@ class OptDefFM2D(OptDef):
             else:
                 self.sim.update(ub)
 
+        Af.destroy()
+        Ai.destroy()
         if(NOT_PARALLEL):
             return gradient
 
