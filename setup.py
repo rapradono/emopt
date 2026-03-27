@@ -9,11 +9,18 @@ class MakeInstall(SetuptoolsInstall):
         if(os.path.exists(deps_file)):
             with open(deps_file, 'r') as fdeps:
                 for line in fdeps:
-                    toks = line.rstrip('\r\n').split('=')
-                    os.environ[toks[0]] = toks[1]
+                    line = line.strip()
+                    if (not line) or line.startswith('#'):
+                        continue
+                    if line.startswith('export '):
+                        line = line[len('export '):]
+                    toks = line.split('=', 1)
+                    if len(toks) == 2:
+                        key, value = toks
+                        os.environ[key] = value
         else:
             pass # install dependencies as needed
-        subprocess.call('make')
+        subprocess.check_call(['make'])
         SetuptoolsInstall.run(self)
 
 setup(name='emopt',
