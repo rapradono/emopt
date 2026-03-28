@@ -2771,8 +2771,10 @@ class FDFD_3D(FDFD):
         for l in range(0,self._mglevels):
             self.buildA(l)
 
-            self._AsT[l] = self._As[l].duplicate(copy=True)
-            self._As[l].transpose(self._AsT[l])
+            # Use PETSc's non-reuse transpose path for compatibility across
+            # PETSc versions. Reuse mode can fail unless explicit precursor
+            # metadata is preserved exactly between calls.
+            self._AsT[l] = self._As[l].transpose()
             self._AsT[l].conjugate()
 
     def buildRst(self, l):
@@ -3037,12 +3039,9 @@ class FDFD_3D(FDFD):
         # Update the transposed matrices
         for l in range(0, self._mglevels):
             A = self._As[l]
-            AT = self._AsT[l]
-            ib, ie = A.getOwnershipRange()
-            for i in range(ib, ie):
-                AT[i,i] = np.conj(A[i,i])
-            AT.assemblyBegin()
-            AT.assemblyEnd()
+            AT = A.transpose()
+            AT.conjugate()
+            self._AsT[l] = AT
 
         if(self.verbose and NOT_PARALLEL):
             info_message('Running forward solver...')

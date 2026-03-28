@@ -23,6 +23,8 @@ while IFS= read -r rel_script; do
   set +e
   (
     cd "$(dirname "$script_path")"
+    # Several examples write artifacts to ./data and assume it exists.
+    mkdir -p data
     OMP_NUM_THREADS=1 MPLBACKEND=Agg \
       timeout "${TIMEOUT_S}s" \
       mpirun -n "$NPROC" python "$(basename "$script_path")"
