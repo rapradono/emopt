@@ -1095,6 +1095,10 @@ class AdjointMethodFM2D(AdjointMethod):
                                       np.conj(dmudp[imin:imax, jmin:jmax])) \
                                )
 
+            # free PETSc distributed vectors before next iteration
+            dAdp.destroy()
+            dAdp_full.destroy()
+
             # revert the system to its original state
             params[i] = p0
             self.update_system(params)
@@ -1105,6 +1109,8 @@ class AdjointMethodFM2D(AdjointMethod):
             else:
                 self.sim.update(ub)
 
+        Af.destroy()
+        Ai.destroy()
         if(NOT_PARALLEL):
             return gradient
 
