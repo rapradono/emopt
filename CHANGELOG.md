@@ -29,6 +29,12 @@ were cherry-picked and adapted for compatibility.
   Replaced the reuse-mode `.duplicate(copy=True)` / `.transpose()` path with
   `A.transpose()` for cross-version PETSc compatibility in `FDFD_3D`.
 
+- **`fdfd.py` — `FDFD_TE.calc_ydAx` leaks temporary PETSc Vec**:
+  Element-wise multiplication creates a new distributed Vec that was never
+  freed. Extracted the scalar result first, then called `product.destroy()`.
+  Added `ub=None` keyword arg to all `calc_ydAx` signatures (base class,
+  `FDFD_TE`, `FDFD_3D`) for forward compatibility with emopt-develop.
+
 ### Memory leak fixes
 
 - **`adjoint_method.py`** (`AdjointMethodFM2D.compute_gradient`): `dAdp` and
