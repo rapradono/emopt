@@ -1935,7 +1935,7 @@ class ModeFullVector(ModeSolver):
         # All field components are interpolated onto the Ez grid.
         if(NOT_PARALLEL):
             if(component == FieldComponent.Ex): # Ex --> don't average
-                return fraw[1:-1, 1:-1]
+                return f_raw[1:-1, 1:-1]
 
             elif(component == FieldComponent.Ey): # Ey --> average x & y
                 Ey = np.copy(f_raw)
@@ -1964,7 +1964,7 @@ class ModeFullVector(ModeSolver):
                 return Hx[1:-1, 1:-1]/4.0
 
             elif(component == FieldComponent.Hy): # Hy --> don't average
-                return f_raw
+                return f_raw[1:-1, 1:-1]
 
             elif(component == FieldComponent.Hz): # Hz --> average along x
                 Hz = np.copy(f_raw)
@@ -2234,7 +2234,12 @@ class ModeFullVector(ModeSolver):
         Hz = self.get_field(i, FieldComponent.Hz, permute=False, squeeze=True)
 
         # normalize power to ~1.0 -- not really necessary
-        S = 0.5*mydx*mydy*np.sum(Ex*np.conj(Hy)-Ey*np.conj(Hx))
+        # Use full 3D Poynting vector magnitude for correctness across all
+        # propagation directions; take real part to avoid complex normalization.
+        Sx = 0.5*mydy*mydz*np.real(np.sum(Ey*np.conj(Hz)-Ez*np.conj(Hy)))
+        Sy = 0.5*mydx*mydz*np.real(np.sum(-Ex*np.conj(Hz)+Ez*np.conj(Hx)))
+        Sz = 0.5*mydx*mydy*np.real(np.sum(Ex*np.conj(Hy)-Ey*np.conj(Hx)))
+        S = np.sqrt(Sx**2+Sy**2+Sz**2)
         Ex = Ex/np.sqrt(S); Ey = Ey/np.sqrt(S); Ez = Ez/np.sqrt(S)
         Hx = Hx/np.sqrt(S); Hy = Hy/np.sqrt(S); Hz = Hz/np.sqrt(S)
 
@@ -2288,6 +2293,21 @@ class ModeFullVector(ModeSolver):
             Mx = np.reshape(Mx, self.domain.shape)
             My = np.reshape(My, self.domain.shape)
             Mz = np.reshape(Mz, self.domain.shape)
+
+            # Constrain the phase such that the dominant source component has zero average phase.
+            # The mode solver does not guarantee an absolute phase for the mode;
+            # constraining it here helps in phase-sensitive applications (e.g. S-parameter calcs).
+            fields = [Ex, Ey, Ez]
+            Is = [np.sum(np.abs(field)**2) for field in fields]
+            ind = np.argmax(Is)
+
+            srcs = [Jx, Jy, Jz, Mx, My, Mz]
+            src_angle = np.angle(srcs[ind])
+            src_I = np.abs(srcs[ind])**2
+            phase = np.percentile(src_angle[src_I > np.mean(src_I)], 51.0)
+
+            for src in srcs:
+                src *= np.exp(-1j*phase)
 
         # permute (if necessary) and return the results
         if(self.ndir == 'x'):
