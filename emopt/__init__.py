@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from . import adjoint_method, fdfd, fdtd, fomutils, grid, io, misc, modes, optimizer, \
-       simulation, geometry
+       simulation, geometry, dvio
 
 __all__ = ["adjoint_method", "fdfd", "fomutils", "grid", "io", "misc", "modes",
-          "optimizer", "fdtd", "simulation", "geometry"]
+          "optimizer", "fdtd", "simulation", "geometry", "dvio"]
