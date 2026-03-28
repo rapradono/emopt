@@ -197,13 +197,15 @@ class FDFD(with_metaclass(ABCMeta, MaxwellSolver)):
         return vdiag
 
     @abstractmethod
-    def calc_ydAx(self, Adiag0):
+    def calc_ydAx(self, Adiag0, ub=None):
         """Calculate y^T * (A1-A0) * x.
 
         Parameters
         ----------
         Adiag0 : PETSc.Vec
             The diagonal of the FDFD matrix.
+        ub : optional
+            Reserved for subclass use (e.g. bounding-box domain filtering).
 
         Returns
         -------
@@ -1429,13 +1431,15 @@ class FDFD_TE(FDFD):
 
         return P_S + P_loss.real
 
-    def calc_ydAx(self, Adiag0):
+    def calc_ydAx(self, Adiag0, ub=None):
         """Calculate y^T * (A1-A0) * x.
 
         Parameters
         ----------
         Adiag0 : PETSc.Vec
             The diagonal of the FDFD matrix.
+        ub : optional
+            Reserved for subclass use (e.g. bounding-box domain filtering).
 
         Returns
         -------
@@ -1448,7 +1452,9 @@ class FDFD_TE(FDFD):
         self.get_A_diag(Adiag1)
 
         product = y * (Adiag1-Adiag0) * x
-        return np.sum(product[...])
+        res = np.sum(product[...])
+        product.destroy()
+        return res
 
 class FDFD_TM(FDFD_TE):
     """Simulate Maxwell's equations in 2D with TM-polarized fields.
@@ -3847,13 +3853,15 @@ class FDFD_3D(FDFD):
 
         return Psrc
 
-    def calc_ydAx(self, Adiag0):
+    def calc_ydAx(self, Adiag0, ub=None):
         """Calculate y^T * (A1-A0) * x.
 
         Parameters
         ----------
         Adiag0 : PETSc.Vec
             The diagonal of the FDFD matrix.
+        ub : optional
+            Reserved for subclass use (e.g. bounding-box domain filtering).
 
         Returns
         -------
