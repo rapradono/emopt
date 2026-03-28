@@ -213,7 +213,7 @@ class GridMaterial2D(Material2D):
     @M.setter
     def M(self, newM):
         libGrid.GridMaterial2D_delete(self._object)
-        self._object = libGrid.GridMaterial2D_new(newM, self._N, grid)
+        self._object = libGrid.GridMaterial2D_new(newM, self._N, self._grid)
         self._M = newM
 
     @property
@@ -223,7 +223,7 @@ class GridMaterial2D(Material2D):
     @N.setter
     def N(self, newN):
         libGrid.GridMaterial_delete(self._object)
-        self._object = libGrid.GridMaterial_new(self._M, newN, grid)
+        self._object = libGrid.GridMaterial_new(self._M, newN, self._grid)
         self._N = newN
 
     @property
