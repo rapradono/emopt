@@ -105,5 +105,5 @@ if(NOT_PARALLEL):
         ax2.set_ylabel('Refractive Index')
 
     axes[2].set_xlabel('x [um]', fontsize=12)
-    plt.show()
-
+    if 'agg' not in plt.get_backend().lower():
+        plt.show()

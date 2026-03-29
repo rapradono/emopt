@@ -3042,7 +3042,8 @@ class FDFD_3D(FDFD):
         for l in range(0,self._mglevels-1):
             self.update_multigrid(l)
 
-        # Update the transposed matrices
+        # Rebuild the transposed matrices from the current multigrid matrices.
+        # PETSc no longer permits the old in-place transpose reuse/update path.
         for l in range(0, self._mglevels):
             A = self._As[l]
             AT = A.transpose()

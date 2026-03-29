@@ -30,8 +30,8 @@ wavelength = 1.31
 ####################################################################################
 # Define the material distributions!
 ####################################################################################
-eps_Si = 3.5**2
-eps_SiO2 = 1.444**2
+eps_Si = 3.5068**2
+eps_SiO2 = 1.4467**2
 
 w_wg = 1.0
 h_SOI = 0.22
@@ -86,4 +86,5 @@ if(NOT_PARALLEL):
     ax.contour(eps_arr.real, levels=[eps_SiO2, eps_Si], extent=[0,W,0,H],
                 linewidths=[1,], colors=['w'], alpha=0.5)
     f.colorbar(im)
-    plt.show()
+    if 'agg' not in plt.get_backend().lower():
+        plt.show()

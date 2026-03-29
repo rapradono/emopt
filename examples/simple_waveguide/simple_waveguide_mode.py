@@ -113,4 +113,5 @@ if(NOT_PARALLEL):
     ax.set_title('Re{$E_z$}', fontsize=18)
     ax.set_xlabel('x [um]', fontsize=14)
     ax.set_ylabel('y [um]', fontsize=14)
-    plt.show()
+    if 'agg' not in plt.get_backend().lower():
+        plt.show()

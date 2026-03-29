@@ -38,6 +38,7 @@
 # misc files
 *.h5
 *.pdf
+Miniforge3-Linux-x86_64.sh
 .*.swp
 .DS_Store
 ._.DS_Store

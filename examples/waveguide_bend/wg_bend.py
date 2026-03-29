@@ -14,6 +14,7 @@ from emopt.adjoint_method import AdjointMethod
 from emopt.misc import NOT_PARALLEL, run_on_master
 
 import numpy as np
+import os
 from math import pi
 
 class WGBendAM(AdjointMethod):
@@ -115,6 +116,7 @@ def callback(params, sim, am, fom_history, Ts, Exm, Eym, Hzm):
     additional['source_power'] = sim.source_power
     additional['w_pml'] = w_pml
 
+    os.makedirs('data', exist_ok=True)
     fname = 'data/wg_bend_%d' % (len(fom_history))
     emopt.io.save_results(fname, data, additional)
 
@@ -244,4 +246,5 @@ if __name__ == '__main__':
         plt.plot(xs,ys,'w',linewidth=0.5)
         plt.xlim(extent[0:2])
         plt.ylim(extent[2:])
-        plt.show()
+        if 'agg' not in plt.get_backend().lower():
+            plt.show()

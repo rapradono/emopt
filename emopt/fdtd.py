@@ -1134,8 +1134,20 @@ class FDTD(MaxwellSolver):
                     A0s = np.concatenate(A0s)
                     A1s = np.concatenate(A1s)
 
-                    A_change = np.linalg.norm(A1s-A0s)/np.linalg.norm(A0s)
-                    phi_change = np.linalg.norm(phi1s-phi0s)/np.linalg.norm(phi0s)
+                    A_delta = np.linalg.norm(A1s-A0s)
+                    A_base = np.linalg.norm(A0s)
+                    phi_delta = np.linalg.norm(phi1s-phi0s)
+                    phi_base = np.linalg.norm(phi0s)
+
+                    if A_base == 0.0:
+                        A_change = 0.0 if A_delta == 0.0 else np.inf
+                    else:
+                        A_change = A_delta / A_base
+
+                    if phi_base == 0.0:
+                        phi_change = 0.0 if phi_delta == 0.0 else np.inf
+                    else:
+                        phi_change = phi_delta / phi_base
                 else:
                     A_change = 1
                     phi_change = 1

@@ -31,6 +31,6 @@ eps_grid = eps.get_values(0,Nx,0,Ny)
 f = plt.figure()
 ax = f.add_subplot(111)
 ax.imshow(eps_grid.real, extent=[0,5,0,3], cmap='Blues')
-plt.show()
-
+if 'agg' not in plt.get_backend().lower():
+    plt.show()
 
