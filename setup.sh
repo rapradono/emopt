@@ -16,6 +16,39 @@ mamba_exec() {
     "$mamba_exec_cmd" "$@"
 }
 
+load_conda_shell() {
+    local candidate
+    local conda_base=""
+
+    if command -v conda >/dev/null 2>&1; then
+        conda_base="$(conda info --base 2>/dev/null)"
+    elif [ -x "$HOME/miniforge3/bin/conda" ]; then
+        conda_base="$HOME/miniforge3"
+    elif [ -x "$HOME/mambaforge/bin/conda" ]; then
+        conda_base="$HOME/mambaforge"
+    elif [ -x "$HOME/anaconda3/bin/conda" ]; then
+        conda_base="$HOME/anaconda3"
+    elif [ -x "$HOME/miniconda3/bin/conda" ]; then
+        conda_base="$HOME/miniconda3"
+    fi
+
+    if [ -n "$conda_base" ] && [ -f "$conda_base/etc/profile.d/conda.sh" ]; then
+        # shellcheck disable=SC1090
+        source "$conda_base/etc/profile.d/conda.sh"
+        return 0
+    fi
+
+    for candidate in "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile"; do
+        if [ -f "$candidate" ]; then
+            # shellcheck disable=SC1090
+            source "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 read -p "Do you have an existing installation of mamba (community made anaconda reimplementation)? [y/n] " existing_mamba
 
 case $existing_mamba in
@@ -60,14 +93,16 @@ case $existing_mamba in
         ;;
 esac
 
-if [ -f "$HOME/.bashrc" ]; then
-    # Needed for conda/mamba shell functions in non-interactive scripts.
-    source "$HOME/.bashrc"
-fi
+# Needed for conda/mamba shell functions in non-interactive scripts.
+load_conda_shell || true
 
 if [ -z "$mamba_exec_cmd" ]; then
     echo "Could not determine package manager command (mamba/conda). Exiting."
     safe_exit 1
+fi
+
+if ! command -v "$mamba_exec_cmd" >/dev/null 2>&1; then
+    load_conda_shell || true
 fi
 
 if ! command -v "$mamba_exec_cmd" >/dev/null 2>&1; then
@@ -128,14 +163,21 @@ else
     safe_exit 1
 fi
 
-echo export OMP_NUM_THREADS=1 >> "$HOME/.bashrc"
+if [ -f "$HOME/.bashrc" ]; then
+    if ! grep -qxF 'export OMP_NUM_THREADS=1' "$HOME/.bashrc"; then
+        echo 'export OMP_NUM_THREADS=1' >> "$HOME/.bashrc"
+    fi
+else
+    echo 'export OMP_NUM_THREADS=1' > "$HOME/.bashrc"
+fi
+
 rm -f "$HOME/.emopt_deps"
 cat > "$HOME/.emopt_deps" <<EOF
-EIGEN_DIR=$CONDA_PREFIX/include/eigen3
-BOOST_DIR=$CONDA_PREFIX/include/
-PETSC_DIR=$CONDA_PREFIX/
-PETSC_ARCH=
-SLEPC_DIR=$CONDA_PREFIX/
+export EIGEN_DIR=$CONDA_PREFIX/include/eigen3
+export BOOST_DIR=$CONDA_PREFIX/include/
+export PETSC_DIR=$CONDA_PREFIX/
+export PETSC_ARCH=
+export SLEPC_DIR=$CONDA_PREFIX/
 EOF
 
 source "$HOME/.emopt_deps"
