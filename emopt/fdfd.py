@@ -2771,8 +2771,7 @@ class FDFD_3D(FDFD):
         for l in range(0,self._mglevels):
             self.buildA(l)
 
-            self._AsT[l] = self._As[l].duplicate(copy=True)
-            self._As[l].transpose(self._AsT[l])
+            self._AsT[l] = self._As[l].transpose()
             self._AsT[l].conjugate()
 
     def buildRst(self, l):
@@ -3034,15 +3033,11 @@ class FDFD_3D(FDFD):
         for l in range(0,self._mglevels-1):
             self.update_multigrid(l)
 
-        # Update the transposed matrices
+        # Rebuild the transposed matrices from the current multigrid matrices.
+        # PETSc no longer permits the old in-place transpose reuse/update path.
         for l in range(0, self._mglevels):
-            A = self._As[l]
-            AT = self._AsT[l]
-            ib, ie = A.getOwnershipRange()
-            for i in range(ib, ie):
-                AT[i,i] = np.conj(A[i,i])
-            AT.assemblyBegin()
-            AT.assemblyEnd()
+            self._AsT[l] = self._As[l].transpose()
+            self._AsT[l].conjugate()
 
         if(self.verbose and NOT_PARALLEL):
             info_message('Running forward solver...')

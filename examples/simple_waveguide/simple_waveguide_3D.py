@@ -84,4 +84,5 @@ if(NOT_PARALLEL):
     f = plt.figure()
     ax = f.add_subplot(111)
     ax.imshow(np.real(Ey), extent=[0,X-w_pml*2,0,Y-w_pml*2], vmin=-vmax, vmax=vmax, cmap='seismic')
-    plt.show()
+    if 'agg' not in plt.get_backend().lower():
+        plt.show()

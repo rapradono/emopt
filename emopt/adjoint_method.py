@@ -705,11 +705,13 @@ class AdjointMethod(with_metaclass(ABCMeta, object)):
                 ax3.set_title('Error in Adjoint Method')
 
                 for ax in [ax1, ax2, ax3]:
+                    ax.set_xticks(xs)
                     ax.set_xticklabels(['%d' % i for i in indices])
 
-                ax3.set_yscale('log', nonposy='clip')
+                ax3.set_yscale('log')
 
-                plt.show()
+                if 'agg' not in plt.get_backend().lower():
+                    plt.show()
 
             if(return_gradients):
                 return error_tot, grad_fd, grad_am

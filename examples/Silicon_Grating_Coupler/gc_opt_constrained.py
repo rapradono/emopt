@@ -49,6 +49,7 @@ from emopt.misc import NOT_PARALLEL
 from emopt.adjoint_method import AdjointMethodPNF2D
 
 import numpy as np
+import os
 from math import pi
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
@@ -306,6 +307,7 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
     data['foms'] = fom_list
 
     i = len(fom_list)
+    os.makedirs('data', exist_ok=True)
     fname = 'data/gc_8deg_opt_constrained'
     emopt.io.save_results(fname, data)
 
@@ -486,9 +488,18 @@ if __name__ == '__main__':
     # Fourier series
     N_coeffs = 5
 
-    # load the results of the unconstrained parameterization
-    data = emopt.io.load_results('data/gc_opt_results')
-    params = data['params']
+    # Load the unconstrained result when available; otherwise start from the
+    # same uniform grating used in gc_opt.py.
+    if os.path.exists('data/gc_opt_results.h5'):
+        data = emopt.io.load_results('data/gc_opt_results')
+        params = data['params']
+    else:
+        params = np.zeros(N_coeffs*4+3)
+        params[0*N_coeffs] = (1-df) * period
+        params[2*N_coeffs] = period
+        params[-3] = h_etch
+        params[-2] = 0.0
+        params[-1] = h_BOX
 
     params = comm.bcast(params, root=0)
 

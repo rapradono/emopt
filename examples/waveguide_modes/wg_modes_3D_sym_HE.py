@@ -90,4 +90,5 @@ if(NOT_PARALLEL):
     ax.contour(eps_arr.real, levels=[eps_SiO2, eps_Si], extent=[0,W,0,H],
                 linewidths=[1,], colors=['w'], alpha=0.5)
     f.colorbar(im)
-    plt.show()
+    if 'agg' not in plt.get_backend().lower():
+        plt.show()

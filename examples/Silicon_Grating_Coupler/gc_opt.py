@@ -39,6 +39,7 @@ from emopt.misc import NOT_PARALLEL
 from emopt.adjoint_method import AdjointMethodPNF2D
 
 import numpy as np
+import os
 from math import pi
 
 class SiliconGratingAM(AdjointMethodPNF2D):
@@ -266,6 +267,7 @@ def plot_update(params, fom_list, sim, am):
     data['foms'] = fom_list
 
     i = len(fom_list)
+    os.makedirs('data', exist_ok=True)
     fname = 'data/gc_opt_results'
     emopt.io.save_results(fname, data)
 

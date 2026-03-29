@@ -81,4 +81,5 @@ if(NOT_PARALLEL):
             'w-', linewidth=1.0)
 
     f.colorbar(im)
-    plt.show()
+    if 'agg' not in plt.get_backend().lower():
+        plt.show()
