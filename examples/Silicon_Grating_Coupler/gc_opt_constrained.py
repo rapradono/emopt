@@ -54,6 +54,10 @@ from math import pi
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 
+def progress(msg):
+    if(NOT_PARALLEL):
+        print("[progress] %s" % msg, flush=True)
+
 class SiliconGratingAM(AdjointMethodPNF2D):
     """Compute the merit function and gradient of a grating coupler.
 
@@ -285,10 +289,12 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
     iteration of the optimization. It plots the current refractive index
     distribution, the electric field, and the full figure of merit history.
     """
+    progress('optimizer callback start iteration %d' % (len(fom_list)+1))
     current_fom = -1*am.calc_fom(sim, params)
     fom_nopenalty = current_fom + am.calc_penalty(sim, params)
     fom_list.append(current_fom)
     fom_unconstrained.append(fom_nopenalty)
+    progress('optimizer callback fom %.6e penalty_free %.6e' % (current_fom, fom_nopenalty))
 
     Ez, Hx, Hy = sim.saved_fields[1]
     eps = sim.eps.get_values_in(sim.field_domains[1])
@@ -310,6 +316,7 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
     os.makedirs('data', exist_ok=True)
     fname = 'data/gc_8deg_opt_constrained'
     emopt.io.save_results(fname, data)
+    progress('optimizer callback saved %s.h5' % fname)
 
 if __name__ == '__main__':
     ####################################################################################
@@ -329,6 +336,7 @@ if __name__ == '__main__':
 
     # create the simulation object.
     # TE => Ez, Hx, Hy
+    progress('create FDFD_TE simulation')
     sim = emopt.fdfd.FDFD_TE(X, Y, dx, dy, wavelength)
 
     # Get the actual width and height
@@ -417,6 +425,7 @@ if __name__ == '__main__':
     mu = emopt.grid.ConstantMaterial2D(1.0)
 
     # add the materials and build the system
+    progress('set materials')
     sim.set_materials(eps, mu)
 
     ####################################################################################
@@ -424,7 +433,7 @@ if __name__ == '__main__':
     ####################################################################################
 
     if(NOT_PARALLEL):
-        print('Generating mode data...')
+        progress('generate source mode data')
 
     # We begin by setting up the source
     Jz = np.zeros([M,N], dtype=np.complex128)
@@ -437,12 +446,15 @@ if __name__ == '__main__':
 
     # Setup the mode solver. 
     mode = emopt.modes.ModeTE(wavelength, eps, mu, src_line, n0=2.5, neigs=4)
+    progress('build source mode solver')
     mode.build()
+    progress('solve source mode solver')
     mode.solve()
 
     # at this point we have found the modes but we dont know which mode is the
     # one we fundamental mode.  We have a way to determine this, however
     mindex = mode.find_mode_index(0)
+    mindex = emopt.misc.COMM.bcast(mindex, root=0)
 
     # calculate the source from the mode fields
     msrc = mode.get_source(mindex, dx, dy)
@@ -452,6 +464,7 @@ if __name__ == '__main__':
     Jz[src_line.j, src_line.k] = msrc[0]
     Mx[src_line.j, src_line.k] = msrc[1]
     My[src_line.j, src_line.k] = msrc[2]
+    progress('set explicit sources from mode index %d' % mindex)
     sim.set_sources((Jz, Mx, My))
 
     ####################################################################################
@@ -466,6 +479,7 @@ if __name__ == '__main__':
     ####################################################################################
     # Build the system
     ####################################################################################
+    progress('build simulation system matrix')
     sim.build()
 
     ####################################################################################
@@ -475,6 +489,7 @@ if __name__ == '__main__':
     # We initialize our application-specific adjoint method object which is
     # responsible for computing the figure of merit and its gradient with
     # respect to the design parameters of the problem
+    progress('create adjoint method')
     am = SiliconGratingAM(sim, grating_etch, wg, substrate, y_ts,
                           w_wg_input, h_wg, Y, Ng, eps_clad, mm_line)
 
@@ -521,7 +536,9 @@ if __name__ == '__main__':
     design_params[-2] = params[-2]
     design_params[-1] = params[-1]
 
+    progress('start gradient check')
     am.check_gradient(design_params, indices=np.arange(0,len(design_params),10))
+    progress('finished gradient check')
 
     fom_list = []
     fom_unconstrained = []
@@ -530,6 +547,7 @@ if __name__ == '__main__':
     # setup and run the optimization!
     # Note: For this optimization, it turns out that L-BFGS-B works a lot
     # better than normal BFGS (this is not totally unusual)
+    progress('create optimizer')
     opt = emopt.optimizer.Optimizer(am, design_params, tol=1e-5,
                                     callback_func=callback,
                                     opt_method='L-BFGS-B', Nmax=30)
@@ -537,7 +555,9 @@ if __name__ == '__main__':
     # Run the optimization
     # A good thing to do would be to save the results of the optimization. This
     # can be done using the emopt.misc.save_results function.
+    progress('start optimizer run stage 1')
     fom, params = opt.run()
+    progress('finished optimizer run stage 1 fom %.6e' % fom)
 
     params = comm.bcast(params, root=0)
 
@@ -547,7 +567,9 @@ if __name__ == '__main__':
     opt.p0 = params
 
     # Run the second optimization with medium constraints
+    progress('start optimizer run stage 2')
     fom, params = opt.run()
+    progress('finished optimizer run stage 2 fom %.6e' % fom)
     params = comm.bcast(params, root=0)
 
     # setup the third optimization with strict constraints
@@ -566,4 +588,6 @@ if __name__ == '__main__':
     am.penalty = 0.2
     opt.p0 = params
 
+    progress('start optimizer run stage 3')
     fom, params = opt.run()
+    progress('finished optimizer run stage 3 fom %.6e' % fom)

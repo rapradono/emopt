@@ -48,6 +48,10 @@ from math import pi
 from petsc4py import PETSc
 from mpi4py import MPI
 
+def progress(msg):
+    if(NOT_PARALLEL):
+        print("[progress] %s" % msg, flush=True)
+
 class MMISplitterAdjointMethod(AdjointMethodPNF3D):
     """Define a figure of merit and its derivative for adjoint sensitivity
     analysis.
@@ -147,6 +151,7 @@ wavelength = 1.55
 #####################################################################################
 # Setup the simulation--rtol tells the iterative solver when to stop. 5e-5
 # yields reasonably accurate results/gradients
+progress('create FDFD_3D simulation')
 sim = emopt.fdfd.FDFD_3D(X,Y,Z,dx,dy,dz,wavelength, rtol=5e-5)
 w_pml = dx * 15 # set the PML width
 
@@ -191,7 +196,9 @@ eps.add_primitive(rbg, -Z, Z)
 mu = emopt.grid.ConstantMaterial3D(1.0)
 
 # Set the materials and build the system
+progress('set materials')
 sim.set_materials(eps, mu)
+progress('build simulation system matrix')
 sim.build()
 
 #####################################################################################
@@ -206,9 +213,12 @@ mode = emopt.modes.ModeFullVector(wavelength, eps, mu, input_slice, n0=3.45,
 # The mode boundary conditions should match the simulation boundary conditins.
 # Mode is in the y-z plane, so the boundary conditions are HE
 mode.bc = 'HE'
+progress('build input mode solver')
 mode.build()
+progress('solve input mode solver')
 mode.solve()
 
+progress('set sources from input mode')
 sim.set_sources(mode, input_slice)
 
 #####################################################################################
@@ -224,7 +234,9 @@ fom_mode = emopt.modes.ModeFullVector(wavelength, eps, mu, fom_slice, n0=3.45,
 
 # Need to be consistent with boundary conditions!
 fom_mode.bc = 'HE'
+progress('build fom mode solver')
 fom_mode.build()
+progress('solve fom mode solver')
 fom_mode.solve()
 
 # Retrieve the fields for the mode match
@@ -243,16 +255,22 @@ mode_match = emopt.fomutils.ModeMatch([1,0,0], dy, dz, Exm, Eym, Ezm,
 #####################################################################################
 sim.field_domains = [fom_slice]
 
+progress('create adjoint method')
 am = MMISplitterAdjointMethod(sim, mmi, fom_slice, mode_match)
 params = np.array([w_mmi, L_mmi])
+progress('start gradient check')
 am.check_gradient(params)
+progress('finished gradient check')
 
 #####################################################################################
 # Setup and run the optimization
 #####################################################################################
 # L-BFGS-B will print out the iteration number and FOM value
+progress('create optimizer')
 opt = emopt.optimizer.Optimizer(am, params, Nmax=10, opt_method='L-BFGS-B')
+progress('start optimizer run')
 fom, pfinal = opt.run()
+progress('finished optimizer run fom %.6e' % fom)
 
 # run a simulation to make sure we visualize the correct data
 am.fom(pfinal)
@@ -274,4 +292,3 @@ if(NOT_PARALLEL):
     ax1 = f.add_subplot(111)
     ax1.imshow(np.real(Ey), extent=[0,X-2*w_pml,0,2*Y-2*w_pml], vmin=-vmax, vmax=vmax, cmap='seismic')
     plt.show()
-

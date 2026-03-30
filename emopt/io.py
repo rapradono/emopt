@@ -229,6 +229,9 @@ def plot_iteration(field, structure, W, H, foms, fname='', layout='auto',
         plt.tight_layout()
         plt.show()
 
+    plt.close(f)
+    return f
+
 @run_on_master
 def save_results(fname, data, additional=None):
     """Save an hdf5 file containing common simulation and optimization results.

@@ -33,7 +33,6 @@ in the command line which will run the optimization using 16 cores on the curren
 machine.
 
 """
-# We need to import a lot of things from emopt
 import emopt
 from emopt.misc import NOT_PARALLEL
 from emopt.adjoint_method import AdjointMethodPNF2D
@@ -41,6 +40,10 @@ from emopt.adjoint_method import AdjointMethodPNF2D
 import numpy as np
 import os
 from math import pi
+
+def progress(msg):
+    if(NOT_PARALLEL):
+        print("[progress] %s" % msg, flush=True)
 
 class SiliconGratingAM(AdjointMethodPNF2D):
     """Compute the merit function and gradient of a grating coupler.
@@ -246,9 +249,10 @@ def plot_update(params, fom_list, sim, am):
     iteration of the optimization. It plots the current refractive index
     distribution, the electric field, and the full figure of merit history.
     """
-    print('Finished iteration %d' % (len(fom_list)+1))
+    progress('optimizer callback start iteration %d' % (len(fom_list)+1))
     current_fom = -1*am.calc_fom(sim, params)
     fom_list.append(current_fom)
+    progress('optimizer callback fom %.6e' % current_fom)
 
     Ez, Hx, Hy = sim.saved_fields[1]
     eps = sim.eps.get_values_in(sim.field_domains[1])
@@ -270,6 +274,7 @@ def plot_update(params, fom_list, sim, am):
     os.makedirs('data', exist_ok=True)
     fname = 'data/gc_opt_results'
     emopt.io.save_results(fname, data)
+    progress('optimizer callback saved %s.h5' % fname)
 
 if __name__ == '__main__':
     ####################################################################################
@@ -283,6 +288,7 @@ if __name__ == '__main__':
 
     # create the simulation object.
     # TE => Ez, Hx, Hy
+    progress('create FDFD_TE simulation')
     sim = emopt.fdfd.FDFD_TE(X, Y, dx, dy, wavelength)
 
     # Get the actual width and height
@@ -365,6 +371,7 @@ if __name__ == '__main__':
     mu = emopt.grid.ConstantMaterial2D(1.0)
 
     # add the materials and build the system
+    progress('set materials')
     sim.set_materials(eps, mu)
 
     ####################################################################################
@@ -380,16 +387,20 @@ if __name__ == '__main__':
     mode = emopt.modes.ModeTE(wavelength, eps, mu, src_line, n0=n_si, neigs=4)
 
     if(NOT_PARALLEL):
-        print('Generating mode data...')
+        progress('generate source mode data')
 
+    progress('build source mode solver')
     mode.build()
+    progress('solve source mode solver')
     mode.solve()
 
     # at this point we have found the modes but we dont know which mode is the
     # one we fundamental mode.  We have a way to determine this, however
     mindex = mode.find_mode_index(0)
+    mindex = emopt.misc.COMM.bcast(mindex, root=0)
 
     # set the current sources using the mode solver object
+    progress('set sources from mode index %d' % mindex)
     sim.set_sources(mode, src_line, mindex)
 
     ####################################################################################
@@ -404,6 +415,7 @@ if __name__ == '__main__':
     ####################################################################################
     # Build the system
     ####################################################################################
+    progress('build simulation system matrix')
     sim.build()
 
     ####################################################################################
@@ -422,20 +434,26 @@ if __name__ == '__main__':
     # We initialize our application-specific adjoint method object which is
     # responsible for computing the figure of merit and its gradient with
     # respect to the design parameters of the problem
+    progress('create adjoint method')
     am = SiliconGratingAM(sim, grating_etch, wg, substrate, y_ts,
                             w_wg_input, h_wg, Y, Ng, N_coeffs, eps_clad, mm_line)
 
+    progress('start gradient check')
     am.check_gradient(design_params)
+    progress('finished gradient check')
     #am.check_gradient(design_params, indices=np.arange(0,len(design_params),2))
 
     fom_list = []
     callback = lambda x : plot_update(x, fom_list, sim, am)
 
     # setup and run the optimization!
+    progress('create optimizer')
     opt = emopt.optimizer.Optimizer(am, design_params, tol=1e-5,
                                     callback_func=callback,
                                     opt_method='BFGS',
                                     Nmax=40)
 
     # Run the optimization
+    progress('start optimizer run')
     final_fom, final_params = opt.run()
+    progress('finished optimizer run fom %.6e' % final_fom)
