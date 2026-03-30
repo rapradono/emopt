@@ -39,10 +39,13 @@ from emopt.misc import NOT_PARALLEL, run_on_master
 from emopt.adjoint_method import AdjointMethodPNF3D
 
 import numpy as np
+import os
 from math import pi
 
 from petsc4py import PETSc
 from mpi4py import MPI
+
+RUN_GRADIENT_CHECK = os.environ.get('EMOPT_RUN_GRADIENT_CHECK', '').lower() in ('1', 'true', 'yes', 'on')
 
 def progress(msg):
     if(NOT_PARALLEL):
@@ -259,9 +262,12 @@ sim.field_domains = [fom_slice]
 progress('create adjoint method')
 am = MMISplitterAdjointMethod(sim, mmi, fom_slice, mode_match)
 params = np.array([w_mmi, L_mmi])
-progress('start gradient check')
-am.check_gradient(params)
-progress('finished gradient check')
+if RUN_GRADIENT_CHECK:
+    progress('start gradient check')
+    am.check_gradient(params)
+    progress('finished gradient check')
+else:
+    progress('skip gradient check (set EMOPT_RUN_GRADIENT_CHECK=1 to enable)')
 
 #####################################################################################
 # Setup and run the optimization

@@ -44,8 +44,15 @@ bash setup-python.sh
 ```
 
 Creates `.venv/` (Python 3.13), installs `mpi4py`, `petsc4py`, `slepc4py`,
-`pandas`, `pyyaml`, `pdftotext`, and emopt itself, then builds the native
-C++ extensions.
+CPU-only PyTorch, `pandas`, `pyyaml`, `pdftotext`, and emopt itself, then
+builds the native C++ extensions.
+
+Useful overrides:
+
+```bash
+bash setup-python.sh --no-torch
+bash setup-python.sh --torch-gpu
+```
 
 Validated working combination on this branch:
 

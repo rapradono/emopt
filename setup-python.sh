@@ -8,14 +8,14 @@
 #
 # Options:
 #   --torch-gpu       Install PyTorch with CUDA support
-#   --torch-cpu       Install PyTorch CPU-only
+#   --torch-cpu       Install PyTorch CPU-only (default)
 #   --no-torch        Skip PyTorch entirely
-#   --no-interactive  Non-interactive / CI mode (implies --no-torch)
+#   --no-interactive  Non-interactive / CI mode
 
 set -euo pipefail
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
-TORCH_MODE="ask"   # ask | gpu | cpu | no
+TORCH_MODE="cpu"   # gpu | cpu | no
 INTERACTIVE=1
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
     --torch-gpu)      TORCH_MODE="gpu"; shift ;;
     --torch-cpu)      TORCH_MODE="cpu"; shift ;;
     --no-torch)       TORCH_MODE="no";  shift ;;
-    --no-interactive) INTERACTIVE=0; TORCH_MODE="no"; shift ;;
+    --no-interactive) INTERACTIVE=0; shift ;;
     *) echo "Unknown argument: $1"; exit 1 ;;
   esac
 done
@@ -96,14 +96,7 @@ uv pip install "petsc4py==3.21.5" --no-build-isolation --no-deps
 info "Installing slepc4py (links against $SLEPC_DIR)..."
 uv pip install "slepc4py==3.21.2" --no-build-isolation --no-deps
 
-# ── PyTorch (optional) ────────────────────────────────────────────────────────
-if [[ "$TORCH_MODE" == "ask" && $INTERACTIVE -eq 1 ]]; then
-  echo
-  info "PyTorch is required only for experimental features (AutoDiff, topology opt)."
-  read -rp "Install PyTorch? [gpu/cpu/no] " _torch
-  TORCH_MODE="${_torch:-no}"
-fi
-
+# ── PyTorch (optional, CPU by default) ───────────────────────────────────────
 case "$TORCH_MODE" in
   gpu) info "Installing PyTorch (GPU/CUDA)..."
        uv pip install torch ;;
