@@ -111,6 +111,13 @@ uv pip install "slepc4py==3.21.2" --no-build-isolation --no-deps
 uv pip install -e /path/to/emopt --no-build-isolation
 ```
 
+Or, from the active environment in the other repo, run the helper shipped in
+this repo:
+
+```bash
+/path/to/emopt/scripts/install-into-active-venv.sh
+```
+
 If you change native code in `emopt/src`, rebuild from the `emopt` checkout:
 
 ```bash

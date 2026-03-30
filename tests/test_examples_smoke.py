@@ -17,6 +17,13 @@ SMOKE_EXAMPLES = [
     "examples/simple_waveguide/simple_waveguide_symmetric_y.py",
     "examples/waveguide_modes/wg_modes_2D.py",
     "examples/waveguide_modes/wg_modes_2D_symmetry.py",
+    "examples/waveguide_modes/wg_modes_3D.py",
+    "examples/waveguide_modes/wg_modes_3D_sym_0E.py",
+    "examples/waveguide_modes/wg_modes_3D_sym_0H.py",
+    "examples/waveguide_modes/wg_modes_3D_sym_E0.py",
+    "examples/waveguide_modes/wg_modes_3D_sym_EH.py",
+    "examples/waveguide_modes/wg_modes_3D_sym_H0.py",
+    "examples/waveguide_modes/wg_modes_3D_sym_HE.py",
     "examples/klayout_import/klayout_import.py",
 ]
 

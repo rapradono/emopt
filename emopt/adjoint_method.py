@@ -648,8 +648,12 @@ class AdjointMethod(with_metaclass(ABCMeta, object)):
             Relative error in gradient.
         """
 
-        if(indices == []):
-            indices = np.arange(0, len(params),1)
+        if indices is None:
+            indices = np.arange(0, len(params), 1)
+        else:
+            indices = np.asarray(indices)
+            if indices.size == 0:
+                indices = np.arange(0, len(params), 1)
 
         # make sure everything is up to date
         self.update_system(params)

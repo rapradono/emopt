@@ -37,7 +37,14 @@ class WGBendAM(AdjointMethod):
         mr = np.zeros(len(x)); mr[1] = 1
         x, y = emopt.geometry.fillet(x, y, Rout, make_round=mr,
                                        points_per_bend=50, ignore_roc_lim=True)
-        mr = np.zeros(len(x)); mr[53] = 1
+
+        # After the outer-corner fillet, select the inner bend corner by its
+        # geometric location instead of relying on a fragile hardcoded index.
+        target_x = self.xs[3]
+        target_y = self.ys[4]
+        target_idx = np.argmin((x - target_x)**2 + (y - target_y)**2)
+
+        mr = np.zeros(len(x)); mr[target_idx] = 1
         x, y = emopt.geometry.fillet(x, y, Rin, make_round=mr,
                                        points_per_bend=50, ignore_roc_lim=True)
 
