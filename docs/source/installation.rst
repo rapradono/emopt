@@ -4,74 +4,63 @@
 Installation Instructions
 #########################
 
-Here we list the new recommended installation instructions. Please see `Legacy Installation Instructions`_ below for a list of all dependencies. If you already have an existing installation of PETSc or are using an unusual Linux/hardware environment, you may want to skip to those instructions. The instructions here will assume that you are using a modern Linux distribution, and have installed common compiler tools (e.g., gcc). With a few tweaks, this will likely work for Mac and Windows based systems.
+Here we list the new recommended installation instructions. Please see `Legacy Installation Instructions`_ below for a list of all dependencies. If you already have an existing installation of PETSc or are using an unusual Linux/hardware environment, you may want to skip to those instructions. The instructions here assume Ubuntu 22.04 / WSL2 Linux with standard compiler tools available.
 
-We have included a helpful interactive setup tool. Simply download the repo and run::
+Prerequisites
+=============
 
-    $ git clone https://github.com/anstmichaels/emopt.git
-    $ cd emopt
-    $ . setup.sh
+* Ubuntu 22.04 / WSL2 Linux
+* ~5 GB free disk space
+* ~30 minutes for first-time PETSc build
+* ``sudo`` access for apt packages
 
-then, follow the prompts.
-
-The folowing provides a description of what ``setup.sh`` does, in case you prefer a custom installation or are not using a Linux x86-64 architecture. 
-
-First, we highly recommend you install ``mamba`` (see documentation `here <https://mamba.readthedocs.io/en/latest/index.html>`_ for more info)::
-
-    $ wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh
-    $ . Miniforge3-Linux-x86_64.sh
-
-.. note::
-
-    Replace ``Linux-x86_64`` with your desired Miniforge release.
-
-.. warning::
-
-    If you have an existing installation of anaconda, you may not want to do this. You can try to replace ``mamba`` with ``conda`` below. However, note that the dependency resolution may not work correctly. Please also set strict channel priority, with priority given to the ``conda-forge`` channel in your ``~/.condarc``. There is a method to upgrade an existing anaconda installation to mamba `here <https://mamba.readthedocs.io/en/latest/installation/mamba-installation.html#existing-conda-install-not-recommended>`_, but it is not recommended by the creators.
-
-We may now install the dependencies::
-
-    $ mamba create --name emopt -c conda-forge python pip numpy scipy matplotlib requests \
-      h5py future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py
-    $ mamba activate emopt
-
-.. note::
-
-    This command installs OpenMPI for you in your local mamba environment. If you have an existing global system install that you would rather use, you will need to use the package specification ``openmpi=X.Y.*=external_*`` where ``X`` and ``Y`` are the major and minor version numbers. Please see `here <https://mpi4py.readthedocs.io/en/latest/install.html#using-conda>`_ for more info. 
-
-.. note::
-
-    You may also exclude ``eigen``, ``boost``, ``petsc``, and ``slepc`` from the above if you have existing installs (with given version numbers), and point to those installations with the environment variables provided below. However, if exlcuding ``petsc`` and ``slepc``, you will also need to exclude ``petsc4py`` and ``slecp4py``. See `here <https://www.mcs.anl.gov/petsc/petsc4py-current/docs/usrman/install.html>`_ for instructions to install ``petsc4py`` and ``slepc4py`` using ``pip``. Be sure to do this after you have created your ``emopt`` mamba environment.
-
-EMopt now provides support for automatic differentiation enhanced feature-mapping methods and free-form topology optimziation. If you would like to use these experimental features, please also install PyTorch::
-
-    $ mamba install -c conda-forge pytorch
-
-.. note::
-
-    If you do not have a GPU, you may prefer to install the CPU-only version of PyTorch, ``pytorch-cpu``, instead.
-
-We now must set environment variables. Open your ``~/.bashrc`` and include::
-
-    export OMP_NUM_THREADS=1
-
-then reload with ``source ~/.bashrc`` on the command line. Now open a file in your home directory called ``~/.emopt_deps`` and include the following::
-
-    export EIGEN_DIR=~/miniforge3/envs/emopt/include/eigen3
-    export BOOST_DIR=~/miniforge3/envs/emopt/include/
-    export PETSC_DIR=~/miniforge3/envs/emopt/
-    export PETSC_ARCH=""
-    export SLEPC_DIR=~/miniforge3/envs/emopt/
-
-.. note::
-
-   If you have alternate installation locations for any of the above, or used a different environment name for EMopt, please update the path accordingly. Your local environment path can be found with ``echo $CONDA_PREFIX``.
-
-If you haven't done so you may now download EMopt, and then install::
+We provide a two-step setup workflow. Clone the repository, then run::
 
     $ git clone https://github.com/anstmichaels/emopt.git
     $ cd emopt
-    $ pip install --no-deps -vvv .
+    $ bash setup-system-deps.sh
+    $ bash setup-python.sh
+
+``setup-system-deps.sh`` installs build tools, OpenMPI, Eigen, Boost, and
+Poppler development libraries via ``apt``, then builds PETSc with complex
+arithmetic support and SLEPc from source into ``~/.emopt``.
+
+``setup-python.sh`` creates ``.venv`` with Python 3.10, installs ``mpi4py``,
+``petsc4py``, ``slepc4py``, ``pandas``, ``pyyaml``, ``pdftotext``, and then
+installs EMopt itself.
+
+The validated working combination on this branch is:
+
+* Python ``3.10.20``
+* PETSc ``3.21.5``
+* SLEPc ``3.21.2``
+* ``petsc4py==3.21.5``
+* ``slepc4py==3.21.2``
+* ``setuptools<70``
+* ``Cython==3.0.10``
+
+If you want to enable the experimental automatic differentiation and topology
+optimization features, ``setup-python.sh`` can also install PyTorch for you.
+
+These variables are written automatically by ``setup-system-deps.sh`` to
+``~/.emopt_deps``. They are sourced by ``setup-python.sh`` before the Python
+build. If you need to set them manually::
+
+    source ~/.emopt_deps
+
+Or export them directly::
+
+    export EIGEN_DIR=/usr/include/eigen3
+    export BOOST_DIR=/usr/include
+    export PETSC_DIR=$HOME/.emopt
+    export PETSC_ARCH=
+    export SLEPC_DIR=$HOME/.emopt
+
+After the first system-level build, you can recreate only the Python
+environment later with::
+
+    source ~/.emopt_deps
+    bash setup-python.sh
 
 You've completed the installation!
 
@@ -242,34 +231,28 @@ installed.
 Installing EMopt
 ================
 
-Once the dependencies are installed, we are ready to install EMopt. If you installed
-the dependencies using the install.py as described in the previous section, you can
-go ahead and run the setup.py script::
+Once the dependencies are installed, we are ready to install EMopt. Source the
+dependency file and run the Python environment setup script::
 
-    $ python setup.py install --user
+    source ~/.emopt_deps
+    bash setup-python.sh
 
-Assuming this completes without error, you should be all set and ready to go!
+These variables are written automatically by ``setup-system-deps.sh`` to
+``~/.emopt_deps``. They are sourced by ``setup-python.sh`` before the Python
+build. If you need to set them manually::
 
-In some scenarios, you may have installed the EMopt dependencies manually. In this
-case, you need to create a file call ``~/.emopt_deps`` which contains the following
-contents::
+    source ~/.emopt_deps
 
-    EIGEN_DIR=/path/to/eigen/includes
-    BOOST_DIR=/path/to/boost/includes
-    PETSC_DIR=/path/to/petsc/installation
-    SLEPC_DIR=/path/to/slepc/installation
+Or export them directly::
 
-For example, if you have made these dependencies available system wide by installing
-them in the ``/opt`` folder, your ``~/.emopt_deps`` file might look like the
-following::
+    export EIGEN_DIR=/usr/include/eigen3
+    export BOOST_DIR=/usr/include
+    export PETSC_DIR=$HOME/.emopt
+    export PETSC_ARCH=
+    export SLEPC_DIR=$HOME/.emopt
 
-    EIGEN_DIR=/opt/include
-    BOOST_DIR=/opt/include
-    PETSC_DIR=/opt/petsc/petsc-3.8.0
-    SLEPC_DIR=/opt/slepc/slepc-3.8.1
-
-After this file has been created, you should be ready to run the EMopt setup.py
-script as described above.
+After this file has been created, you should be ready to run the EMopt
+installation workflow described above.
 
 To learn how to use EMopt, head over to the :ref:`tutorials
 section<tutorials_main>` section.

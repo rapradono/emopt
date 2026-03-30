@@ -1,3 +1,52 @@
 [build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "emopt"
+version = "2023.01.16"
+description = "A suite of tools for optimizing the shape and topology of electromagnetic structures."
+readme = "README.md"
+license = { text = "BSD-3-Clause" }
+authors = [
+  { name = "Andrew Michaels", email = "amichaels@berkeley.edu" },
+]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "scipy",
+  "matplotlib",
+  "h5py",
+  "pyyaml",
+  "pandas",
+  "pdftotext",
+  "requests",
+  "future",
+  # mpi4py, petsc4py, slepc4py must be pre-installed with --no-build-isolation
+  # before running 'pip install -e .' — see setup-python.sh.
+  # Listed here so 'pip show emopt' reports them as dependencies.
+  "mpi4py",
+  "petsc4py",
+  "slepc4py",
+]
+
+[project.optional-dependencies]
+experimental = ["torch"]
+dev = [
+  "pytest",
+  "sphinx",
+  "sphinx-rtd-theme",
+  "sphinxcontrib-fulltoc",
+  "mock",
+]
+
+[project.urls]
+Homepage = "https://github.com/anstmichaels/emopt"
+Documentation = "https://emopt.readthedocs.io"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["emopt*"]
+
+[tool.setuptools.package-data]
+emopt = ["*.so", "*.csv", "data/*"]

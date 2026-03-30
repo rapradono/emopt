@@ -1,4 +1,13 @@
 #!/bin/bash
+# ── DEPRECATED ────────────────────────────────────────────────────────────────
+# This script (conda/mamba-based) is deprecated in the emopt-uv branch.
+# Use the uv-based workflow instead:
+#
+#   bash setup-system-deps.sh   # install system deps + build PETSc/SLEPc
+#   bash setup-python.sh        # create .venv and install Python packages
+#
+# This file is kept for reference only.
+# ──────────────────────────────────────────────────────────────────────────────
 
 safe_exit() {
     local code="$1"

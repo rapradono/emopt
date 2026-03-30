@@ -1,0 +1,90 @@
+name: Test
+
+on:
+  push:
+    branches: [emopt-uv, master]
+  pull_request:
+    branches: [emopt-uv]
+
+env:
+  PETSC_VERSION: "3.21.5"
+  SLEPC_VERSION: "3.21.2"
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── System packages ──────────────────────────────────────────────────
+      - name: Install apt dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential g++ gfortran make cmake wget \
+            libopenmpi-dev openmpi-bin \
+            libeigen3-dev libboost-dev \
+            libopenblas-dev liblapack-dev
+
+      # ── PETSc / SLEPc cache ──────────────────────────────────────────────
+      # Cache key includes PETSc+SLEPc versions. Invalidated on version bump.
+      - name: Cache PETSc/SLEPc build
+        id: cache-petsc
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.emopt
+          key: petsc-${{ env.PETSC_VERSION }}-slepc-${{ env.SLEPC_VERSION }}-ubuntu22
+
+      - name: Build PETSc and SLEPc from source
+        if: steps.cache-petsc.outputs.cache-hit != 'true'
+        run: |
+          bash setup-system-deps.sh \
+            --prefix "${{ github.workspace }}/.emopt" \
+            --petsc-version "${{ env.PETSC_VERSION }}" \
+            --slepc-version "${{ env.SLEPC_VERSION }}" \
+            --no-interactive
+
+      # ~/.emopt_deps is NOT cached (it's in $HOME, not workspace).
+      # Write it explicitly every run so env vars always point to the right prefix.
+      - name: Write ~/.emopt_deps
+        run: |
+          INSTALL_PREFIX="${{ github.workspace }}/.emopt"
+          cat > "$HOME/.emopt_deps" <<EOF
+          export EIGEN_DIR=/usr/include/eigen3
+          export BOOST_DIR=/usr/include
+          export PETSC_DIR=${INSTALL_PREFIX}
+          export PETSC_ARCH=
+          export SLEPC_DIR=${INSTALL_PREFIX}
+          EOF
+
+      # ── Python environment ───────────────────────────────────────────────
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Create venv and install emopt
+        run: |
+          source "$HOME/.emopt_deps"
+          bash setup-python.sh --no-interactive
+
+      # ── Tests ────────────────────────────────────────────────────────────
+      - name: Smoke tests
+        run: |
+          source .venv/bin/activate
+          python -c "import emopt"
+          python -c "
+          from petsc4py import PETSc
+          assert PETSc.ScalarType == complex, f'Got {PETSc.ScalarType}'
+          print(f'PETSc scalar type: {PETSc.ScalarType}')
+          "
+          python -c "from slepc4py import SLEPc"
+          python -c "from mpi4py import MPI"
+          mpirun -n 2 python -c \
+            "from mpi4py import MPI; print(f'rank {MPI.COMM_WORLD.Get_rank()}')"
+
+      - name: Run test suite
+        run: |
+          source .venv/bin/activate
+          python -m pytest tests/ -x -q --tb=short
