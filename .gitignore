@@ -56,3 +56,6 @@ docs/build/html
 
 # uv / virtual environment
 .venv/
+
+# local validation artifacts
+.example-runs/

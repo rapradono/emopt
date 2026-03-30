@@ -1,5 +1,11 @@
 # Changelog
 
+This is the canonical changelog for this repository.
+
+The old plaintext `CHANGELOG` file was legacy upstream release history. It was
+removed during repository cleanup to avoid maintaining two changelog files. The
+historical content remains available in git history if needed.
+
 ## Backports from emopt-develop (2026-03-28)
 
 The upstream maintainer's `develop` branch has diverged significantly (~2 years
