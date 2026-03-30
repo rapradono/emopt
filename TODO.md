@@ -9,6 +9,54 @@ packaging, and examples.
 
 ## Next
 
+### PETSc / SLEPc 3.24 upgrade
+
+- Upgrade the numerical stack as a coordinated set, not piecemeal:
+  PETSc, SLEPc, `petsc4py`, and `slepc4py` should move together to a `3.24.x`
+  line.
+- Treat this as a compatibility and supportability upgrade first, not a
+  guaranteed solver-performance project.
+- Preserve current solver behavior where possible:
+  MUMPS-backed direct solves,
+  current PETSc option usage,
+  `GNHEP` mode-solver paths,
+  existing example semantics.
+- Keep the public API stable unless a break is clearly justified.
+
+Planned execution order:
+
+- Update install/build pins in `setup-system-deps.sh` and `setup-python.sh`.
+- Rebuild PETSc/SLEPc and relink the Python bindings in a fresh `.venv`.
+- Run focused solver checks first:
+  import smoke,
+  `petsc4py` scalar type check,
+  `slepc4py` import,
+  one 2D FDFD example,
+  one 3D mode-solver example.
+- Then run heavier validation:
+  `examples/waveguide_bend/wg_bend.py`,
+  `examples/MMI_splitter_3D/mmi_1x2_splitter_3D_fdfd.py`,
+  selected tests under `tests/`.
+- Compare behavior against the current `3.21.x` baseline:
+  solve success,
+  factorization failures,
+  obvious memory regressions,
+  major runtime deltas,
+  effective-index consistency for mode solves.
+
+Code areas most likely to need attention:
+
+- PETSc factor-solver compatibility shims in `emopt/fdfd.py` and `emopt/modes.py`
+- transpose and matrix-copy paths in `emopt/fdfd.py`
+- SLEPc eigenvalue handling in `emopt/modes.py`
+- setup and smoke-test scripts
+
+Decision rule:
+
+- If `3.24.x` is stable with modest patching, keep it.
+- If the upgrade creates repeated solver regressions or much higher build
+  complexity, stop and document the blocker rather than forcing the bump.
+
 ### Anisotropic materials
 
 - Add anisotropic permittivity support to the mode-solver path on `main`.
@@ -101,6 +149,11 @@ packaging, and examples.
 
 ## Open questions
 
+- Does PETSc/SLEPc `3.24.x` materially improve robustness on the difficult
+  MUMPS-backed problems used here, or is the real value mainly supportability
+  and Python/toolchain freshness?
+- Which validation set is the minimum credible gate for numerical-stack
+  upgrades on this repo?
 - Should anisotropic support remain mode-solver-first for a while, or should
   the API be designed immediately for cross-solver reuse?
 - What is the smallest CI matrix that still gives confidence for MPI, PETSc,
