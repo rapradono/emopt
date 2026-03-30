@@ -69,9 +69,6 @@ To recreate the Python environment later (without rebuilding PETSc):
 source ~/.emopt_deps && bash setup-python.sh
 ```
 
-> **Legacy install (conda/mamba):** `setup.sh` is preserved for reference
-> but deprecated in this branch.
-
 ## Free-Form Topology and AutoDiff-Enhanced Feature-Mapping Approaches
 
 New optional experimental modules for topology optimization and automatic 
