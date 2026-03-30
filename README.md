@@ -23,8 +23,54 @@ Details on how to install and use EMopt can be found
 periodically as the documentation is constantly being improved and examples
 added.
 
-New: please see the new `mamba`-based install script `setup.sh` for
-streamlined installation.
+## Installation
+
+**Requirements:** Ubuntu 22.04 / WSL2 Linux, `sudo` access, ~5 GB disk, ~30 min first run.
+
+### 1. System dependencies + PETSc/SLEPc (run once)
+
+```bash
+bash setup-system-deps.sh
+```
+
+This installs `g++`, `gfortran`, OpenMPI, Eigen, Boost, and Poppler via `apt`,
+then builds PETSc (with complex arithmetic) and SLEPc from source into
+`~/.emopt`.
+
+### 2. Python environment (uv)
+
+```bash
+bash setup-python.sh
+```
+
+Creates `.venv/` (Python 3.10), installs `mpi4py`, `petsc4py`, `slepc4py`,
+`pandas`, `pyyaml`, `pdftotext`, and emopt itself, then builds the native
+C++ extensions.
+
+Validated working combination on this branch:
+
+- Python `3.10.20`
+- PETSc `3.21.5`
+- SLEPc `3.21.2`
+- `petsc4py==3.21.5`
+- `slepc4py==3.21.2`
+- `setuptools<70`
+- `Cython==3.0.10`
+
+### 3. Activate
+
+```bash
+source .venv/bin/activate
+```
+
+To recreate the Python environment later (without rebuilding PETSc):
+
+```bash
+source ~/.emopt_deps && bash setup-python.sh
+```
+
+> **Legacy install (conda/mamba):** `setup.sh` is preserved for reference
+> but deprecated in this branch.
 
 ## Free-Form Topology and AutoDiff-Enhanced Feature-Mapping Approaches
 

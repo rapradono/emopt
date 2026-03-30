@@ -4,22 +4,17 @@ import subprocess, os, sys
 
 class MakeInstall(SetuptoolsInstall):
     def run(self):
-        home_dir = os.path.expanduser('~')
-        deps_file = home_dir + '/.emopt_deps'
-        if(os.path.exists(deps_file)):
-            with open(deps_file, 'r') as fdeps:
-                for line in fdeps:
-                    line = line.strip()
-                    if (not line) or line.startswith('#'):
-                        continue
-                    if line.startswith('export '):
-                        line = line[len('export '):]
-                    toks = line.split('=', 1)
-                    if len(toks) == 2:
-                        key, value = toks
-                        os.environ[key] = value
-        else:
-            pass # install dependencies as needed
+        required = ['EIGEN_DIR', 'BOOST_DIR', 'PETSC_DIR', 'SLEPC_DIR']
+        missing = [v for v in required if not os.environ.get(v)]
+        if missing:
+            print(
+                "ERROR: The following environment variables must be set before "
+                "installing emopt:\n"
+                f"  {', '.join(missing)}\n"
+                "Run 'source ~/.emopt_deps' or 'bash setup-python.sh' first.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         subprocess.check_call(['make'])
         SetuptoolsInstall.run(self)
 
