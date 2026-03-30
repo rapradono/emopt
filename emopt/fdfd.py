@@ -346,13 +346,6 @@ class FDFD_TE(FDFD):
         # This should be a non-issue as long as PMLs are used
         self._bc = ['0', '0']
 
-        # Match the ordering controls used in the heavier mode-solver paths.
-        # This can materially affect MUMPS stability and memory behavior.
-        options = PETSc.Options()
-        if 'mat_mumps_icntl_28' not in options:
-            options.setValue('mat_mumps_icntl_28', 2)
-            options.setValue('mat_mumps_icntl_29', 1)
-
         # PML parameters -- these can be changed
         self.pml_sigma = 3.0
         self.pml_power = 3.0
@@ -418,8 +411,6 @@ class FDFD_TE(FDFD):
             pc.setReusePreconditioner(True)
         else:
             pc.setType('none')
-        self.ksp_iter.setFromOptions()
-
         # create a direct linear solver
         self.ksp_dir = PETSc.KSP()
         self.ksp_dir.create(PETSc.COMM_WORLD)
@@ -432,8 +423,6 @@ class FDFD_TE(FDFD):
             pc.setFactorSolverPackage('mumps')
         except AttributeError as ae:
             pc.setFactorSolverType('mumps')
-        self.ksp_dir.setFromOptions()
-
         self._solver_type = solver
 
         self.Ez = np.array([])
@@ -1086,10 +1075,12 @@ class FDFD_TE(FDFD):
         if(self._solver_type == 'iterative' or self._solver_type == 'iterative_lu'):
             ksp = self.ksp_iter
             ksp.setOperators(self._A, self._A)
+            ksp.setFromOptions()
 
         elif(self._solver_type == 'direct' or self._solver_type == 'auto'):
             ksp = self.ksp_dir
             ksp.setOperators(self._A, self._A)
+            ksp.setFromOptions()
 
         ksp.solve(self.b, self.x)
 
@@ -1147,10 +1138,12 @@ class FDFD_TE(FDFD):
         if(self._solver_type == 'iterative' or self._solver_type == 'iterative_lu'):
             ksp = self.ksp_iter
             ksp.setOperators(self._A, self._A)
+            ksp.setFromOptions()
 
         elif(self._solver_type == 'direct' or self._solver_type == 'auto'):
             ksp = self.ksp_dir
             ksp.setOperators(self._A, self._A)
+            ksp.setFromOptions()
 
         ksp.solveTranspose(self.b_adj, self.x_adj)
 
