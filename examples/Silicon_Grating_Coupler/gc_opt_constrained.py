@@ -54,6 +54,8 @@ from math import pi
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
 
+DISABLE_ITERATION_ARTIFACTS = os.environ.get('EMOPT_DISABLE_ITERATION_ARTIFACTS', '').lower() in ('1', 'true', 'yes', 'on')
+
 def progress(msg):
     if(NOT_PARALLEL):
         print("[progress] %s" % msg, flush=True)
@@ -295,6 +297,10 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
     fom_list.append(current_fom)
     fom_unconstrained.append(fom_nopenalty)
     progress('optimizer callback fom %.6e penalty_free %.6e' % (current_fom, fom_nopenalty))
+
+    if(DISABLE_ITERATION_ARTIFACTS):
+        progress('optimizer callback artifacts disabled')
+        return
 
     Ez, Hx, Hy = sim.saved_fields[1]
     eps = sim.eps.get_values_in(sim.field_domains[1])

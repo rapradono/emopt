@@ -41,6 +41,8 @@ import numpy as np
 import os
 from math import pi
 
+DISABLE_ITERATION_ARTIFACTS = os.environ.get('EMOPT_DISABLE_ITERATION_ARTIFACTS', '').lower() in ('1', 'true', 'yes', 'on')
+
 def progress(msg):
     if(NOT_PARALLEL):
         print("[progress] %s" % msg, flush=True)
@@ -253,6 +255,10 @@ def plot_update(params, fom_list, sim, am):
     current_fom = -1*am.calc_fom(sim, params)
     fom_list.append(current_fom)
     progress('optimizer callback fom %.6e' % current_fom)
+
+    if(DISABLE_ITERATION_ARTIFACTS):
+        progress('optimizer callback artifacts disabled')
+        return
 
     Ez, Hx, Hy = sim.saved_fields[1]
     eps = sim.eps.get_values_in(sim.field_domains[1])
