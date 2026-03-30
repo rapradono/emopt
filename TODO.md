@@ -1,59 +1,109 @@
 # TODO
 
-## Anisotropic Materials
+## Roadmap
 
-Goal: bring anisotropic mode-solver support to `main` without carrying forward
-the branch-specific shortcuts from `origin/anisotropic-eps`.
+This roadmap is intended to keep `main` focused on the highest-leverage work:
+improve the simulation stack where it is clearly limited, make optimization
+workflows more robust, and raise the engineering baseline around testing,
+packaging, and examples.
 
-### Keep
+## Next
 
-- Extend `ModeFullVector` so it can solve waveguide modes with anisotropic
-  permittivity.
-- Preserve the useful LiNbO3 example as a validation target and user-facing
-  demonstration.
-- Keep input validation around anisotropic material inputs instead of silently
-  accepting unsupported shapes.
+### Anisotropic materials
 
-### Drop
+- Add anisotropic permittivity support to the mode-solver path on `main`.
+- Prefer a tensor-shaped API with explicit physical components over positional
+  list conventions.
+- Keep isotropic materials as a trivial compatible case.
+- Scope the first implementation deliberately if needed:
+  diagonal tensors first is acceptable if the public API does not block
+  off-diagonal support later.
+- Preserve a useful anisotropic example as both documentation and validation.
+- Add tests for isotropic backward compatibility, diagonal anisotropy, and
+  invalid tensor/input shapes.
 
-- Do not keep the ad hoc `eps = [eps_x, eps_y, eps_z]` API as the long-term
-  public interface.
-- Do not merge the old example unchanged. It skips mode `0`, prints
-  `modes.neff[0]` for both plotted modes, and is too narrowly tied to the
-  original prototype.
-- Do not revive the old installer or other branch-era compatibility edits just
-  because they happened to live on the same feature branch.
+### Reliability and tests
 
-### Preferred Direction
+- Expand coverage beyond example smoke tests.
+- Add focused tests for geometry helpers, material-grid behavior, mode-solver
+  invariants, and adjoint gradient checks.
+- Add at least one compact MPI test path in CI so solver regressions are caught
+  before example-level failures.
 
-- Introduce a general tensor-material representation for the mode solver,
-  preferably explicit enough to support:
-  - isotropic materials as a trivial case
-  - diagonal anisotropy
-  - off-diagonal tensor terms when the formulation supports them
-- Define the tensor API around physical components, not positional list
-  conventions.
-- Make domain-orientation handling explicit so tensor components are mapped
-  correctly for `x`, `y`, and `z` propagation slices.
+### Packaging and build cleanup
 
-### Implementation Plan
+- Reduce overlap and ambiguity between `pyproject.toml` and `setup.py`.
+- Make the supported installation path explicit and keep the native-extension
+  build prerequisites easy to diagnose.
+- Remove or stop tracking generated build artifacts where possible.
+- Standardize local run artifacts so they do not pollute the worktree by
+  default.
 
-- Design the anisotropic material API and decide whether it lives in
-  `emopt.grid`, `emopt.modes`, or a small dedicated tensor helper module.
-- Port the useful parts of the `origin/anisotropic-eps` `ModeFullVector`
-  changes onto `main` in a form that matches the chosen tensor API.
-- Add a corrected LiNbO3 example based on the old prototype.
-- Add tests covering:
-  - isotropic backward compatibility
-  - diagonal anisotropy
-  - invalid tensor/input shapes
-  - at least one known-reference effective index or mode-field smoke test
-- Document the supported tensor forms and any solver limitations.
+### Documentation and quickstart
 
-### Open Questions
+- Add a concise quickstart covering:
+  forward simulation,
+  mode solving plus source excitation,
+  adjoint optimization.
+- Document the current solver limitations more explicitly, especially around
+  anisotropy, 3D constraints, and FDTD material support.
+- Keep examples aligned with current install instructions and tested workflows.
 
-- Does the current full-vector formulation on this code path support a fully
-  general permittivity tensor, or should the first version intentionally scope
-  to diagonal tensors while keeping the API tensor-shaped?
-- Should anisotropic support also be exposed to other solvers later, or remain
-  mode-solver-only for now?
+## Later
+
+### Broader solver capabilities
+
+- Extend anisotropic material support beyond the mode solver where the
+  formulation supports it.
+- Improve 3D FDFD material handling beyond the current planar restrictions.
+- Add cleaner support for additional boundary-condition and source workflows.
+- Improve field extraction and interpolation consistency across solver types.
+
+### Optimization workflow improvements
+
+- Add source-derivative support in the adjoint stack.
+- Reduce gradient-computation cost through better update-box handling and
+  matrix-update reuse.
+- Add more structured helpers for constrained optimization workflows.
+- Improve parity between the classic adjoint path and the experimental
+  autodiff-enhanced path.
+
+### User experience
+
+- Refactor common example setup into reusable helpers instead of duplicating
+  boilerplate across scripts.
+- Improve error messages around missing PETSc, SLEPc, MPI, and native build
+  dependencies.
+- Add a cleaner results/logging story for longer optimization runs, including
+  saved snapshots and restart-friendly outputs.
+
+## Research
+
+### Material models
+
+- Investigate dispersive and more general lossy material support in FDTD.
+- Evaluate whether full tensor permittivity support is practical in the
+  full-vector formulations currently used here.
+
+### Parallel and performance work
+
+- Revisit whether parts of the optimization loop should move off the current
+  `scipy.optimize.minimize` orchestration model.
+- Identify hotspots in matrix assembly, field extraction, and grid smoothing
+  that would benefit from native or parallel refactors.
+
+### Experimental workflows
+
+- Clarify which pieces of `emopt.experimental` are ready to stabilize into the
+  main API.
+- Define a migration path for experimental autodiff geometry and optimization
+  features if they become first-class.
+
+## Open questions
+
+- Should anisotropic support remain mode-solver-first for a while, or should
+  the API be designed immediately for cross-solver reuse?
+- What is the smallest CI matrix that still gives confidence for MPI, PETSc,
+  SLEPc, and native-extension changes?
+- Which examples are the canonical validation targets that should never regress
+  on `main`?
