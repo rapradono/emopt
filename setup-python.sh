@@ -67,8 +67,8 @@ fi
 info "uv: $(uv --version)"
 
 # ── Create virtual environment ────────────────────────────────────────────────
-info "Creating .venv with Python 3.10..."
-uv venv --python 3.10 --clear .venv
+info "Creating .venv with Python 3.13..."
+uv venv --python 3.13 --clear .venv
 # shellcheck disable=SC1091
 source .venv/bin/activate
 info "Python: $(python --version)"
