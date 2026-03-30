@@ -43,13 +43,13 @@ then builds PETSc (with complex arithmetic) and SLEPc from source into
 bash setup-python.sh
 ```
 
-Creates `.venv/` (Python 3.10), installs `mpi4py`, `petsc4py`, `slepc4py`,
+Creates `.venv/` (Python 3.13), installs `mpi4py`, `petsc4py`, `slepc4py`,
 `pandas`, `pyyaml`, `pdftotext`, and emopt itself, then builds the native
 C++ extensions.
 
 Validated working combination on this branch:
 
-- Python `3.10.20`
+- Python `3.13`
 - PETSc `3.21.5`
 - SLEPc `3.21.2`
 - `petsc4py==3.21.5`
