@@ -106,8 +106,7 @@ def plot_update(params, fom_list, sim, am):
 
 
 if __name__=='__main__':
-    torch.set_default_dtype(torch.double)
-    torch.set_default_tensor_type(torch.DoubleTensor)
+    torch.set_default_dtype(torch.float64)
 
     ####################################################################################
     # Simulation parameters

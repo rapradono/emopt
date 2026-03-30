@@ -307,8 +307,8 @@ def plot_update(params, fom_list, fom_unconstrained, sim, am):
 
     foms = {'FOM' : fom_list,
             'Insertion Loss' : fom_unconstrained}
-    emopt.io.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Wreal,
-                            sim.Hreal, foms, fname='current_result.pdf')
+    emopt.io.plot_iteration(np.flipud(Ez.real), np.flipud(eps.real), sim.Xreal,
+                            sim.Yreal, foms, fname='current_result.pdf')
 
     data = {}
     data['Ez'] = Ez
