@@ -69,6 +69,75 @@ To recreate the Python environment later (without rebuilding PETSc):
 source ~/.emopt_deps && bash setup-python.sh
 ```
 
+## Using EMopt From Another Repo
+
+If you want to use `emopt` from a separate `uv`-managed project, treat this
+repo as the system-dependency provider and install `emopt` into the other
+project's virtual environment.
+
+### 1. On a fresh machine, prepare EMopt system dependencies once
+
+```bash
+git clone <your-emopt-fork-url>
+cd emopt
+bash setup-system-deps.sh
+```
+
+This installs PETSc and SLEPc into `~/.emopt` and writes the environment file
+`~/.emopt_deps`.
+
+### 2. In your other repo, create a `uv` environment
+
+```bash
+cd /path/to/your-other-repo
+uv venv --python 3.13
+source .venv/bin/activate
+source ~/.emopt_deps
+```
+
+### 3. Install the PETSc Python bindings into that environment
+
+```bash
+uv pip install "setuptools<70" wheel "Cython==3.0.10"
+uv pip install numpy scipy matplotlib h5py pyyaml pandas requests future pdftotext
+uv pip install mpi4py --no-build-isolation
+uv pip install "petsc4py==3.21.5" --no-build-isolation --no-deps
+uv pip install "slepc4py==3.21.2" --no-build-isolation --no-deps
+```
+
+### 4. Install `emopt` from your cloned checkout
+
+```bash
+uv pip install -e /path/to/emopt --no-build-isolation
+```
+
+If you change native code in `emopt/src`, rebuild from the `emopt` checkout:
+
+```bash
+cd /path/to/emopt
+source ~/.emopt_deps
+make
+```
+
+### 5. Verify from the other repo
+
+```bash
+python - <<'PY'
+import emopt
+from petsc4py import PETSc
+print("emopt ok")
+print("PETSc scalar type:", PETSc.ScalarType)
+PY
+```
+
+Notes:
+
+- `source ~/.emopt_deps` must be active whenever you build or reinstall
+  `petsc4py`, `slepc4py`, or `emopt`.
+- The other repo does not need to vendor PETSc or SLEPc itself; it can reuse
+  the shared `~/.emopt` installation created by `setup-system-deps.sh`.
+- Experimental `emopt.experimental` workflows additionally require PyTorch.
+
 ## Free-Form Topology and AutoDiff-Enhanced Feature-Mapping Approaches
 
 New optional experimental modules for topology optimization and automatic 
