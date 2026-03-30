@@ -346,6 +346,13 @@ class FDFD_TE(FDFD):
         # This should be a non-issue as long as PMLs are used
         self._bc = ['0', '0']
 
+        # Match the ordering controls used in the heavier mode-solver paths.
+        # This can materially affect MUMPS stability and memory behavior.
+        options = PETSc.Options()
+        if 'mat_mumps_icntl_28' not in options:
+            options.setValue('mat_mumps_icntl_28', 2)
+            options.setValue('mat_mumps_icntl_29', 1)
+
         # PML parameters -- these can be changed
         self.pml_sigma = 3.0
         self.pml_power = 3.0
@@ -411,6 +418,7 @@ class FDFD_TE(FDFD):
             pc.setReusePreconditioner(True)
         else:
             pc.setType('none')
+        self.ksp_iter.setFromOptions()
 
         # create a direct linear solver
         self.ksp_dir = PETSc.KSP()
@@ -424,6 +432,7 @@ class FDFD_TE(FDFD):
             pc.setFactorSolverPackage('mumps')
         except AttributeError as ae:
             pc.setFactorSolverType('mumps')
+        self.ksp_dir.setFromOptions()
 
         self._solver_type = solver
 
@@ -1077,12 +1086,10 @@ class FDFD_TE(FDFD):
         if(self._solver_type == 'iterative' or self._solver_type == 'iterative_lu'):
             ksp = self.ksp_iter
             ksp.setOperators(self._A, self._A)
-            ksp.setFromOptions()
 
         elif(self._solver_type == 'direct' or self._solver_type == 'auto'):
             ksp = self.ksp_dir
             ksp.setOperators(self._A, self._A)
-            ksp.setFromOptions()
 
         ksp.solve(self.b, self.x)
 
@@ -1099,7 +1106,6 @@ class FDFD_TE(FDFD):
 
         if(NOT_PARALLEL):
             fields = x_full[...]
-            self.fields = fields
 
             MN = self._M*self._N
 
@@ -1111,6 +1117,8 @@ class FDFD_TE(FDFD):
         # store the source power
         self._source_power = self.get_source_power()
 
+        x_full.destroy()
+        scatter.destroy()
         self.update_saved_fields()
 
     def update_saved_fields(self):
@@ -1139,12 +1147,10 @@ class FDFD_TE(FDFD):
         if(self._solver_type == 'iterative' or self._solver_type == 'iterative_lu'):
             ksp = self.ksp_iter
             ksp.setOperators(self._A, self._A)
-            ksp.setFromOptions()
 
         elif(self._solver_type == 'direct' or self._solver_type == 'auto'):
             ksp = self.ksp_dir
             ksp.setOperators(self._A, self._A)
-            ksp.setFromOptions()
 
         ksp.solveTranspose(self.b_adj, self.x_adj)
 
@@ -1160,7 +1166,6 @@ class FDFD_TE(FDFD):
 
         if(NOT_PARALLEL):
             fields = x_adj_full[...]
-            self.fields_adj = fields
 
             MN = self._M*self._N
 
@@ -1168,6 +1173,9 @@ class FDFD_TE(FDFD):
             self.Ez_adj = np.reshape(fields[0::Nc], [self._M, self._N])
             self.Hx_adj = np.reshape(fields[1::Nc], [self._M, self._N])
             self.Hy_adj = np.reshape(fields[2::Nc], [self._M, self._N])
+
+        x_adj_full.destroy()
+        scatter.destroy()
 
     def get_field(self, component, domain=None):
         """Get the desired (forward) field component.

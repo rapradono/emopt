@@ -129,16 +129,16 @@ case $install_torch in
         read -p "Do you have an NVIDIA GPU for PyTorch? [y/n] " have_gpu
         case $have_gpu in
              y)
-                 mamba_exec create --name "$emopt_name" -c conda-forge -y python pip numpy scipy matplotlib requests h5py future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py pytorch make cxx-compiler
+                 mamba_exec create --name "$emopt_name" -c conda-forge -y python pip numpy scipy matplotlib requests h5py pyyaml pandas future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py pytorch make cxx-compiler
                  ;;
              n)
-                 mamba_exec create --name "$emopt_name" -c conda-forge -y python pip numpy scipy matplotlib requests h5py future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py pytorch-cpu make cxx-compiler
+                 mamba_exec create --name "$emopt_name" -c conda-forge -y python pip numpy scipy matplotlib requests h5py pyyaml pandas future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py pytorch-cpu make cxx-compiler
                  ;;
              *) echo invalid response; safe_exit 1;;
         esac
         ;;
     n)
-        mamba_exec create --name "$emopt_name" -c conda-forge -y python pip numpy scipy matplotlib requests h5py future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py make cxx-compiler
+        mamba_exec create --name "$emopt_name" -c conda-forge -y python pip numpy scipy matplotlib requests h5py pyyaml pandas future eigen=3.3.7 boost=1.73.0 mpi4py openmpi petsc=*=*complex* petsc4py slepc slepc4py make cxx-compiler
         ;;
     *) echo invalid response; safe_exit 1;;
 esac
