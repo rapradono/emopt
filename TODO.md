@@ -27,6 +27,11 @@ Planned execution order:
 
 - Update install/build pins in `setup-system-deps.sh` and `setup-python.sh`.
 - Rebuild PETSc/SLEPc and relink the Python bindings in a fresh `.venv`.
+- Capture a `3.21.x` baseline before changing solver versions:
+  wall-clock runtime,
+  peak RSS if practical,
+  solver success/failure,
+  selected numerical outputs.
 - Run focused solver checks first:
   import smoke,
   `petsc4py` scalar type check,
@@ -43,6 +48,35 @@ Planned execution order:
   obvious memory regressions,
   major runtime deltas,
   effective-index consistency for mode solves.
+
+Benchmark plan:
+
+- Use a small fixed benchmark set that reflects the main solver modes used here:
+  - one 2D FDFD example
+  - one 3D full-vector mode solve
+  - one heavier direct-solver case such as `examples/waveguide_bend/wg_bend.py`
+  - one 3D FDFD example if runtime is still practical
+- Run each benchmark from a clean shell with:
+  `OMP_NUM_THREADS=1`,
+  fixed MPI process count,
+  fixed working directory,
+  fixed input parameters.
+- Record for each case:
+  - success/failure
+  - wall time
+  - if easy to capture, peak RSS
+  - key numerical outputs:
+    effective index,
+    a representative objective value,
+    or another stable scalar result
+- Prefer at least 3 runs for the smaller benchmarks and compare median runtime,
+  not a single noisy timing.
+- Treat performance as acceptable if:
+  - no benchmark becomes numerically unstable
+  - no benchmark regresses badly without a clear reason
+  - runtime changes stay within a reasonable band unless stability improves
+- If results are noisy, bias toward solver stability and reproducibility over a
+  small runtime delta.
 
 Code areas most likely to need attention:
 
@@ -154,6 +188,8 @@ Decision rule:
   and Python/toolchain freshness?
 - Which validation set is the minimum credible gate for numerical-stack
   upgrades on this repo?
+- Which examples are the best long-term benchmark fixtures for solver upgrades,
+  and do any need reduced-size benchmark variants for repeatable timing?
 - Should anisotropic support remain mode-solver-first for a while, or should
   the API be designed immediately for cross-solver reuse?
 - What is the smallest CI matrix that still gives confidence for MPI, PETSc,
