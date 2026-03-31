@@ -16,12 +16,22 @@ mpirun -n 8 python g_opt_2D_AutoDiffPNF2D_BlazedGrating.py --version 'AutoDiff'
 mpirun -n 8 python g_opt_2D_AutoDiffPNF2D_BlazedGrating.py --version 'Standard'
 mpirun -n 8 python g_opt_2D_AutoDiffPNF2D_BlazedGrating.py --version 'AutoDiff' --test True
 """
+import argparse
+import sys
 import time
 from math import pi
 import numpy as np
 import matplotlib.pyplot as plt
 from functools import partial
 import torch
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--Ng', type=int, default=30)
+parser.add_argument('--Nc', type=int, default=5)
+parser.add_argument('--nmax', type=int, default=100)
+parser.add_argument('--skip-gradient-check', action='store_true')
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
 
 import emopt
 from emopt.misc import NOT_PARALLEL
@@ -32,13 +42,6 @@ import emopt.experimental.autodiff_geometry as adg
 from emopt.experimental.optimizer import TimedOptimizer
 
 STEP = 1e-8
-
-# Import the library
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--Ng', type=int, default=30)
-parser.add_argument('--Nc', type=int, default=5)
-args = parser.parse_args()
 
 ###################################################################
 # EMopt-AutoDiff
@@ -283,7 +286,8 @@ if __name__ == '__main__':
 
     am = SiliconGratingAutograd(sim, fdomain, mm_line)
     am.update_system(design_params)
-    am.check_gradient(design_params, fd_step=1e-8)
+    if not args.skip_gradient_check:
+        am.check_gradient(design_params, fd_step=1e-8)
 
     fom_list = []
     callback = lambda x : plot_update(x, fom_list, sim, am)
@@ -293,7 +297,7 @@ if __name__ == '__main__':
                                     callback_func=callback,
                                     opt_method='L-BFGS-B',
                                     #opt_method=adam,
-                                    Nmax=100)
+                                    Nmax=args.nmax)
 
     # Run the optimization
     final_fom, final_params = opt.run()

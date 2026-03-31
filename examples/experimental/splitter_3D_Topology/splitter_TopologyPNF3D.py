@@ -4,19 +4,22 @@ We simulate in 3D FDTD.
 Example usage:
 mpirun -n 16 python splitter_TopologyPNF3D.py
 """
+import argparse
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--planar', default=True, type=bool, help='Constrain to planar 2D lithographically defined device')
+parser.add_argument('--vol_penalty', default=0., type=float, help='Penalty on spurious feature in design')
+parser.add_argument('--nmax', default=300, type=int, help='Maximum optimizer iterations')
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
+
 import emopt
 from emopt.misc import NOT_PARALLEL, run_on_master
 from emopt.experimental.adjoint_method import TopologyPNF3D
 from emopt.experimental.fdtd import FDTD
 from emopt.experimental.grid import TopologyMaterial3D
 import numpy as np
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--planar', default=True, type=bool, help='Constrain to planar 2D lithographically defined device')
-parser.add_argument('--vol_penalty', default=0., type=float, help='Penalty on spurious feature in design')
-args = parser.parse_args()
 
 PLANAR = args.planar
 VOL_PEN = args.vol_penalty
@@ -260,7 +263,7 @@ if __name__ == '__main__':
     opt = emopt.optimizer.Optimizer(am, design_params, tol=1e-5,
                                     callback_func=callback,
                                     opt_method='L-BFGS-B',
-                                    Nmax=300)
+                                    Nmax=args.nmax)
 
     # Run the optimization
     final_fom, final_params = opt.run()

@@ -67,3 +67,19 @@ following cheap compatibility runs were executed with `OMP_NUM_THREADS=1`,
 These checks are not benchmark-quality performance measurements, but they do
 show that the upgraded PETSc/SLEPc stack still works across the main 2D solver,
 an optimization example, and two distinct experimental code paths.
+
+## Remaining experimental examples
+
+Additional experimental validation was done after adding lightweight CLI hooks
+ so the optimization drivers can be run with a single iteration.
+
+| Case | Command tweak | Outcome | Wall time (s) | Max RSS (kB) | Notes |
+|---|---|---|---:|---:|---|
+| `examples/experimental/blazed_grating_coupler_2D_AutoDiff/gc_opt_2D_AutoDiffPNF2D_BlazedGrating.py` | `--nmax 1` | PASS | 16.38 | 1085196 | Exercises the 2D AutoDiff blazed grating path. |
+| `examples/experimental/grating_coupler_2D_AutoDiff_FourierSeries/gc_opt_AutoDiffPNF2D_FourierSeries.py` | `--nmax 1 --skip-gradient-check` | PASS | 15.71 | 1079604 | Exercises the 2D Fourier-series AutoDiff grating path. |
+| `examples/experimental/MMI_splitter_3D_AutoDiff/mmi_1x2_splitter_3D_fdtd_AutoDiffPNF3D.py` | `--nmax 1 --skip-gradient-check` | PARTIAL | — | — | Cleared build, mode solves, forward solve, and adjoint solve without an out-of-memory failure, but was stopped because the one-step 3D CW-FDTD run was too slow for a quick compatibility pass. |
+| `examples/experimental/splitter_3D_Topology/splitter_TopologyPNF3D.py` | `--nmax 1` | NOT RUN | — | — | Deferred because it is larger than the 3D MMI case and is more likely to be limited by local memory/runtime than by PETSc/SLEPc compatibility. |
+
+At this point, every practical 2D experimental example has passed on the
+upgraded stack. The remaining uncertainty is concentrated in the large 3D FDTD
+experimental cases, which need a roomier machine or a longer dedicated run.

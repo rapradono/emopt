@@ -17,6 +17,15 @@ light from a single input waveguide equally between two output waveguides:
 Example usage:
 $ mpirun -n 16 python mmi_1x2_splitter_3D_fdtd_AutoDiffPNF3D.py
 """
+import argparse
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--nmax', type=int, default=50)
+parser.add_argument('--skip-gradient-check', action='store_true')
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
+
 import emopt
 from emopt.misc import NOT_PARALLEL, run_on_master
 from emopt.experimental.fdtd import FDTD
@@ -256,7 +265,8 @@ if __name__=='__main__':
     #am = MMISplitterAdjointMethod(sim, domain, fom_slice, mode_match, eps_clad, eps_si, k, zmin, zmax, wg_i, wg_o1, wg_o2)
     am = MMISplitterAdjointMethod(sim, domain, fom_slice, mode_match)
     am.update_system(design_params)
-    am.check_gradient(design_params, fd_step=1e-6)
+    if not args.skip_gradient_check:
+        am.check_gradient(design_params, fd_step=1e-6)
 
     #####################################################################################
     # Setup and run the optimization
@@ -264,5 +274,5 @@ if __name__=='__main__':
     # L-BFGS-B will print out the iteration number and FOM value
     fom_list = []
     callback = lambda x: plot_update(x, fom_list, sim, am)
-    opt = emopt.optimizer.Optimizer(am, design_params, Nmax=50, opt_method='L-BFGS-B', callback_func=callback)
+    opt = emopt.optimizer.Optimizer(am, design_params, Nmax=args.nmax, opt_method='L-BFGS-B', callback_func=callback)
     fom, pfinal = opt.run()

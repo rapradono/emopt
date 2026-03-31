@@ -21,12 +21,22 @@ mpirun -n 8 python g_opt_2D_AutoDiffPNF2D_BlazedGrating.py --version 'AutoDiff'
 mpirun -n 8 python g_opt_2D_AutoDiffPNF2D_BlazedGrating.py --version 'Standard'
 mpirun -n 8 python g_opt_2D_AutoDiffPNF2D_BlazedGrating.py --version 'AutoDiff' --test True
 """
+import argparse
+import sys
 import time
 from math import pi
 import numpy as np
 import matplotlib.pyplot as plt
 from functools import partial
 import torch
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--Ng', type=int, default=30)
+parser.add_argument('--version', type=str, default='AutoDiff')
+parser.add_argument('--test', type=bool, default=False)
+parser.add_argument('--nmax', type=int, default=500)
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
 
 import emopt
 from emopt.misc import NOT_PARALLEL
@@ -37,14 +47,6 @@ import emopt.experimental.autodiff_geometry as adg
 from emopt.experimental.optimizer import TimedOptimizer
 
 STEP = 1e-8
-
-# Import the library
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--Ng', type=int, default=30)
-parser.add_argument('--version', type=str, default='AutoDiff')
-parser.add_argument('--test', type=bool, default=False)
-args = parser.parse_args()
 
 TEST = args.test
 
@@ -528,7 +530,7 @@ def blazed_coupler(Ng, design_params, version):
     opt = TimedOptimizer(am, design_params, tol=1e-8,
                          callback_func=callback,
                          opt_method='L-BFGS-B',
-                         Nmax=500)
+                         Nmax=args.nmax)
 
     # Run the optimization
     final_fom, final_params = opt.run()
