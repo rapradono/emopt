@@ -9,6 +9,15 @@ To run the code, execute::
 
 in the command line which will run the optimization using 8 cores on the current
 machine."""
+import argparse
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--smoke', action='store_true',
+                    help='Run a cheap compatibility pass without the gradient check and with a single optimizer step.')
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
+
 import emopt
 from emopt.adjoint_method import AdjointMethod
 from emopt.misc import NOT_PARALLEL, run_on_master
@@ -231,15 +240,17 @@ if __name__ == '__main__':
     design_params = np.array([0.25, 0.25+w_wg])
     am = WGBendAM(sim, xs, ys, waveguide, Psrc)
 
-    am.check_gradient(design_params)
+    if not args.smoke:
+        am.check_gradient(design_params)
 
     fom_history = []
     Ts = []
     callback_func = lambda p : callback(p, sim, am, fom_history, Ts, Exm, Eym, Hzm)
 
     bounds = [(0,wg_pos*0.75), (0,wg_pos*0.75)]
+    nmax = 1 if args.smoke else 10
     opt = emopt.optimizer.Optimizer(am, design_params, opt_method='L-BFGS-B',
-                                    Nmax=10, bounds=bounds,
+                                    Nmax=nmax, bounds=bounds,
                                     callback_func=callback_func)
     fom, params = opt.run()
     xs,ys = am.get_current_points(params)

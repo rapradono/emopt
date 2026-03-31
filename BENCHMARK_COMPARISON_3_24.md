@@ -48,5 +48,22 @@ scripts/benchmark_solver_stack.sh --label after-3.24 --profile quick --runs 3
 - The main value of the upgrade is still supportability and freshness of the
   PETSc/SLEPc stack, but the measured quick-profile performance is at least as
   good as the previous baseline.
-- Heavier examples still need follow-up validation before declaring the entire
-  upgrade risk-free.
+- Additional compatibility smoke checks were run on heavier or more
+  feature-specific examples, summarized below.
+
+## Compatibility smoke checks
+
+The quick benchmark suite does not exercise the optimization drivers or the
+experimental adjoint code paths. To cover those after the upgrade, the
+following cheap compatibility runs were executed with `OMP_NUM_THREADS=1`,
+`mpirun -n 2`, and the upgraded `.venv`.
+
+| Case | Command tweak | Outcome | Wall time (s) | Max RSS (kB) | Notes |
+|---|---|---|---:|---:|---|
+| `examples/waveguide_bend/wg_bend.py` | `--smoke` | PASS | 6.47 | 266944 | Skips gradient check and runs a single optimizer step. |
+| `examples/experimental/fast_taper_2D_AutoDiff/FastTaper_2D_AutoDiffPNF2D.py` | `--nmax 1` | PASS | 16.64 | 1410728 | Exercises the experimental AutoDiff FDFD path. |
+| `examples/experimental/splitter_2D_Topology/splitter_TopologyPNF2D.py` | `--nmax 1` | PASS | 8.85 | 757232 | Exercises the experimental topology optimization path. |
+
+These checks are not benchmark-quality performance measurements, but they do
+show that the upgraded PETSc/SLEPc stack still works across the main 2D solver,
+an optimization example, and two distinct experimental code paths.

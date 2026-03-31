@@ -9,9 +9,18 @@ Note that we only parameterize the taper boundary. We use a
 Fourier series parameterization that only permits low spatial
 frequencies for less sensitive, fabrication compatible features
 """
+import argparse
+import sys
 import time
 from functools import partial
 from math import pi
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--version', type=str, default='AutoDiff')
+parser.add_argument('--test', type=bool, default=False)
+parser.add_argument('--nmax', type=int, default=100)
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,12 +37,6 @@ from emopt.experimental.fdfd import FDFD_TM
 from emopt.experimental.grid import HybridMaterial2D, AutoDiffMaterial2D
 from emopt.experimental.autodiff_geometry import step1d, rect1d, rect2d, union, intersection, nl_sin, nl_lin
 from emopt.experimental.optimizer import TimedOptimizer
-
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--version', type=str, default='AutoDiff')
-parser.add_argument('--test', type=bool, default=False)
-args = parser.parse_args()
 
 TEST = args.test
 version = args.version
@@ -484,7 +487,7 @@ def taper_opt():
         callback = lambda pars: plot_update_full(pars, fom_list, sim, am, version, time_list)
         time_list.append(time.time())
 
-    opt = TimedOptimizer(am, params, Nmax=100, opt_method='L-BFGS-B', callback_func=callback)
+    opt = TimedOptimizer(am, params, Nmax=args.nmax, opt_method='L-BFGS-B', callback_func=callback)
     final_fom, final_params = opt.run()
 
     if NOT_PARALLEL:

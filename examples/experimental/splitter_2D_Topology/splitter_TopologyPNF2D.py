@@ -5,19 +5,22 @@ Example usage:
 mpirun -n 8 python splitter_TopologyPNF2D.py
 mpirun -n 8 python splitter_TopologyPNF2D.py --vol_penalty 0.2
 """
+import argparse
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--planar', default=False, type=bool, help='Constrain to 1D features')
+parser.add_argument('--vol_penalty', default=0., type=float, help='Penalty on spurious feature in design')
+parser.add_argument('--nmax', default=300, type=int, help='Maximum optimizer iterations')
+args, remaining_argv = parser.parse_known_args()
+sys.argv = [sys.argv[0], *remaining_argv]
+
 import emopt
 from emopt.misc import NOT_PARALLEL, run_on_master
 from emopt.experimental.adjoint_method import TopologyPNF2D
 from emopt.experimental.fdfd import FDFD_TM
 from emopt.experimental.grid import TopologyMaterial2D
 import numpy as np
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--planar', default=False, type=bool, help='Constrain to 1D features')
-parser.add_argument('--vol_penalty', default=0., type=float, help='Penalty on spurious feature in design')
-args = parser.parse_args()
 
 PLANAR = args.planar
 VOL_PEN = args.vol_penalty
@@ -244,7 +247,7 @@ if __name__ == '__main__':
     opt = emopt.optimizer.Optimizer(am, design_params, tol=1e-5,
                                     callback_func=callback,
                                     opt_method='L-BFGS-B',
-                                    Nmax=300)
+                                    Nmax=args.nmax)
 
     # Run the optimization
     final_fom, final_params = opt.run()
