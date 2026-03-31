@@ -91,10 +91,10 @@ info "Installing mpi4py..."
 uv pip install mpi4py --no-build-isolation
 
 info "Installing petsc4py (links against $PETSC_DIR)..."
-uv pip install "petsc4py==3.21.5" --no-build-isolation --no-deps
+uv pip install "petsc4py==3.24.3" --no-build-isolation --no-deps
 
 info "Installing slepc4py (links against $SLEPC_DIR)..."
-uv pip install "slepc4py==3.21.2" --no-build-isolation --no-deps
+uv pip install "slepc4py==3.24.3" --no-build-isolation --no-deps
 
 # ── PyTorch (optional, CPU by default) ───────────────────────────────────────
 case "$TORCH_MODE" in

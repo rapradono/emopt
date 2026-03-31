@@ -9,8 +9,8 @@
 #
 # Options:
 #   --prefix <dir>      Install prefix (default: $HOME/.emopt)
-#   --petsc-version V   PETSc version (default: 3.21.5)
-#   --slepc-version V   SLEPc version (default: 3.21.2)
+#   --petsc-version V   PETSc version (default: 3.24.3)
+#   --slepc-version V   SLEPc version (default: 3.24.3)
 #   --force             Rebuild even if already installed
 #   --no-interactive    Non-interactive / CI mode (no prompts)
 #
@@ -21,8 +21,8 @@ set -euo pipefail
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
 INSTALL_PREFIX="${EMOPT_PREFIX:-$HOME/.emopt}"
-PETSC_VERSION="${PETSC_VERSION:-3.21.5}"
-SLEPC_VERSION="${SLEPC_VERSION:-3.21.2}"
+PETSC_VERSION="${PETSC_VERSION:-3.24.3}"
+SLEPC_VERSION="${SLEPC_VERSION:-3.24.3}"
 FORCE=0
 INTERACTIVE=1
 

@@ -41,8 +41,8 @@ uv pip install numpy scipy matplotlib h5py pyyaml pandas requests future pdftote
 
 info "Installing MPI / PETSc / SLEPc Python bindings..."
 uv pip install mpi4py --no-build-isolation
-uv pip install "petsc4py==3.21.5" --no-build-isolation --no-deps
-uv pip install "slepc4py==3.21.2" --no-build-isolation --no-deps
+uv pip install "petsc4py==3.24.3" --no-build-isolation --no-deps
+uv pip install "slepc4py==3.24.3" --no-build-isolation --no-deps
 
 info "Building EMopt native libraries from $REPO_ROOT..."
 (

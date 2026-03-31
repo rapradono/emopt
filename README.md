@@ -57,10 +57,10 @@ bash setup-python.sh --torch-gpu
 Validated working combination on this branch:
 
 - Python `3.13`
-- PETSc `3.21.5`
-- SLEPc `3.21.2`
-- `petsc4py==3.21.5`
-- `slepc4py==3.21.2`
+- PETSc `3.24.3`
+- SLEPc `3.24.3`
+- `petsc4py==3.24.3`
+- `slepc4py==3.24.3`
 - `setuptools<70`
 - `Cython==3.0.10`
 
@@ -108,8 +108,8 @@ source ~/.emopt_deps
 uv pip install "setuptools<70" wheel "Cython==3.0.10"
 uv pip install numpy scipy matplotlib h5py pyyaml pandas requests future pdftotext
 uv pip install mpi4py --no-build-isolation
-uv pip install "petsc4py==3.21.5" --no-build-isolation --no-deps
-uv pip install "slepc4py==3.21.2" --no-build-isolation --no-deps
+uv pip install "petsc4py==3.24.3" --no-build-isolation --no-deps
+uv pip install "slepc4py==3.24.3" --no-build-isolation --no-deps
 ```
 
 ### 4. Install `emopt` from your cloned checkout
